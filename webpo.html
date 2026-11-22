@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Bhoomi FPO - Himachal Pradesh Agriculture & Crop Advisory Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        fpoGreen: '#1b4332',
+                        fpoLightGreen: '#2d6a4f',
+                        fpoAccent: '#d8f3dc',
+                        fpoGold: '#d4af37',
+                        fpoCardHeader: '#1e4d58',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f4f6f4; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #2d6a4f; border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-gray-800 antialiased selection:bg-emerald-200 selection:text-emerald-900">
+
+    <!-- TOP HEADER -->
+    <header class="bg-fpoGreen text-white shadow-lg sticky top-0 z-50 border-b border-emerald-800">
+        <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col md:flex-row justify-between items-center gap-3">
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3 cursor-pointer group" onclick="switchTab('catalog')">
+                <div class="w-11 h-11 rounded-2xl border-2 border-amber-400 flex items-center justify-center bg-white/10 text-2xl text-amber-300 shadow-inner group-hover:bg-white/20 transition">
+                    <i class="fa-solid fa-mountain-sun"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-wider leading-none text-white">DEV BHOOMI FPO</h1>
+                    <p class="text-[10px] text-emerald-300 tracking-wider font-bold uppercase mt-1">Himachal Pradesh Technical Agriculture & Crop Advisory Portal</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold">
+                <button onclick="switchTab('catalog')" id="tab-btn-catalog" class="px-4 py-2.5 rounded-xl bg-white/20 text-white font-black transition flex items-center gap-2 shadow-sm border border-white/10">
+                    <i class="fa-solid fa-store"></i> Product Catalog
+                </button>
+                <button onclick="switchTab('advisory')" id="tab-btn-advisory" class="px-4 py-2.5 rounded-lg hover:bg-white/10 text-emerald-100 font-bold transition flex items-center gap-2">
+                    <i class="fa-solid fa-wheat-awn"></i> HP Crop Hub Advisory
+                </button>
+                <button onclick="switchTab('calculator')" id="tab-btn-calculator" class="px-4 py-2.5 rounded-lg hover:bg-white/10 text-emerald-100 font-bold transition flex items-center gap-2">
+                    <i class="fa-solid fa-calculator"></i> Dosage Calculator
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-8">
+
+        <!-- TAB 1: PRODUCT CATALOG -->
+        <section id="tab-catalog" class="space-y-8">
+            
+            <!-- Hero Banner & Real-Time Search -->
+            <div class="bg-gradient-to-br from-fpoGreen via-emerald-900 to-teal-900 text-white p-6 sm:p-10 rounded-3xl shadow-xl border border-emerald-700/50 space-y-6">
+                <div class="max-w-3xl space-y-3">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="bg-amber-400 text-fpoGreen font-black text-xs uppercase px-3.5 py-1.5 rounded-full tracking-wider shadow-sm">Official FPO Store Directory</span>
+                        <span id="catalog-count-badge" class="bg-white/20 text-emerald-100 font-extrabold text-xs px-3.5 py-1.5 rounded-full">Verified Products</span>
+                    </div>
+                    <h2 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">Dev Bhoomi Agricultural Input Store</h2>
+                    <p class="text-sm sm:text-base text-emerald-100 font-medium leading-relaxed">Search active chemical formulations, certified seeds, organic fertilizers, sprayers, and orchard tools with exact dosage specifications for Himachal Pradesh (1 Acre = 5 Bighas).</p>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="max-w-3xl relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-4 text-gray-400 text-lg"></i>
+                    <input type="text" id="catalog-search" onkeyup="filterCatalog()" placeholder="Search brand name, chemical formulation, crop problem, pest, or SKU..." class="w-full pl-12 pr-4 py-4 bg-white text-gray-900 rounded-2xl focus:outline-none focus:ring-4 focus:ring-amber-400 text-sm sm:text-base font-semibold shadow-inner placeholder:text-gray-400">
+                </div>
+            </div>
+
+            <!-- Category Filter Pills -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg sm:text-xl font-black text-gray-900 uppercase tracking-wider flex items-center gap-2.5">
+                        <i class="fa-solid fa-layer-group text-fpoGreen"></i> Filter by Input Category
+                    </h3>
+                    <span id="active-category-indicator" class="text-xs font-bold text-gray-600 bg-gray-200 px-3 py-1 rounded-full">Showing All Categories</span>
+                </div>
+
+                <div class="flex flex-wrap gap-2 sm:gap-3" id="category-pills-container">
+                    <button onclick="filterCategory('all', this)" class="cat-pill px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm bg-fpoGreen text-white shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-border-all"></i> All
+                    </button>
+                    <button onclick="filterCategory('Seed', this)" class="cat-pill px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm bg-white hover:bg-emerald-50 text-gray-700 border border-gray-300 shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-seedling text-amber-600"></i> Seeds & Nursery (<span id="count-seed">0</span>)
+                    </button>
+                    <button onclick="filterCategory('Protection', this)" class="cat-pill px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm bg-white hover:bg-emerald-50 text-gray-700 border border-gray-300 shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-flask-vial text-emerald-600"></i> Crop Protection (IPM) (<span id="count-protection">0</span>)
+                    </button>
+                    <button onclick="filterCategory('Nutrition', this)" class="cat-pill px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm bg-white hover:bg-emerald-50 text-gray-700 border border-gray-300 shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-vial text-blue-600"></i> Fertilizers & Nutrition (<span id="count-nutrition">0</span>)
+                    </button>
+                    <button onclick="filterCategory('Machinery', this)" class="cat-pill px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm bg-white hover:bg-emerald-50 text-gray-700 border border-gray-300 shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-tractor text-purple-600"></i> Machinery & Tools (<span id="count-machinery">0</span>)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Cards Grid -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg sm:text-xl font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-boxes-stacked text-fpoGreen"></i> Product Catalog Directory
+                    </h3>
+                    <span id="results-count" class="text-xs font-black text-emerald-900 bg-emerald-100 px-3 py-1 rounded-lg">Showing Items</span>
+                </div>
+
+                <div id="catalog-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Cards dynamically injected -->
+                </div>
+            </div>
+
+        </section>
+
+        <!-- TAB 2: CROP HUB ADVISORY -->
+        <section id="tab-advisory" class="space-y-8 hidden">
+            
+            <div class="bg-white rounded-3xl shadow-md border border-gray-200 p-6 sm:p-8 space-y-6">
+                <div class="border-b border-gray-200 pb-5 text-center max-w-3xl mx-auto space-y-2">
+                    <span class="text-xs font-black text-amber-700 bg-amber-100 px-3.5 py-1 rounded-full uppercase tracking-wider">Himachal Pradesh Technical Advisory Hub</span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight uppercase">15-CROP GROWTH STAGE FEED</h2>
+                    <p class="text-xs sm:text-sm text-gray-600 font-medium">Select a crop to view its six growth stages, field checks, crop-specific problems and linked products from the crop guide database. Tap a linked product to open its catalog details.</p>
+                </div>
+
+                <!-- Crop Selector Dropdown -->
+                <div class="max-w-xl mx-auto space-y-2">
+                    <label class="block text-center text-xs font-black uppercase tracking-wider text-gray-700">SELECT CROP FOR ADVISORY FEED:</label>
+                    <div class="relative">
+                        <select id="crop-select" onchange="renderDatabaseCropAdvisory()" class="w-full bg-white border-2 border-fpoGreen text-gray-900 text-base sm:text-lg font-black rounded-2xl px-5 py-4 shadow-md focus:outline-none focus:ring-4 focus:ring-emerald-500/30 cursor-pointer appearance-none">
+                            <option value="">Loading crop guide...</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-5 top-5 text-fpoGreen pointer-events-none text-lg"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scrollable Continuous Growth Stages Feed -->
+            <div id="stacked-stages-container" class="space-y-8">
+                <!-- Dynamically Rendered Growth Stages -->
+            </div>
+
+        </section>
+
+        <!-- TAB 3: HIMACHAL DOSAGE & BARREL CALCULATOR -->
+        <section id="tab-calculator" class="space-y-8 hidden">
+            
+            <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-md border border-gray-200 max-w-4xl mx-auto space-y-8">
+                <div class="border-b border-gray-200 pb-5 text-center space-y-2">
+                    <span class="text-xs font-black text-emerald-800 bg-emerald-100 px-3.5 py-1 rounded-full uppercase tracking-wider">Himachal Pradesh Standard Conversion</span>
+                    <h2 class="text-3xl font-black text-fpoGreen">Orchard & Spray Volume Calculator</h2>
+                    <p class="text-xs sm:text-sm text-gray-600 font-medium">Calculate exact chemical quantities based on your orchard area in Bighas ($1\text{ Acre} = 5\text{ Bighas}$) or required 200L barrels and 15L spray pumps.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Calculator Inputs -->
+                    <div class="bg-emerald-50/70 p-6 rounded-2xl border border-emerald-200 space-y-5">
+                        <h4 class="font-extrabold text-emerald-950 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-fpoGreen"></i> Enter Land & Spray Parameters
+                        </h4>
+                        
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black uppercase text-gray-700">Total Orchard Area (in Bighas):</label>
+                            <input type="number" id="calc-bigha" value="5" min="0.5" step="0.5" oninput="calculateDosage()" class="w-full bg-white border border-gray-300 rounded-xl p-3 font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                            <p class="text-[11px] text-gray-500 italic">*5 Bighas = 1 Acre (~4000 sq. meters)</p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black uppercase text-gray-700">Chemical Spray Recommended Dosage Rate:</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" id="calc-rate" value="600" min="1" oninput="calculateDosage()" class="w-full bg-white border border-gray-300 rounded-xl p-3 font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                                <select id="calc-unit" onchange="calculateDosage()" class="bg-white border border-gray-300 rounded-xl p-3 font-extrabold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                                    <option value="g">Grams (g)</option>
+                                    <option value="ml">Milliliters (ml)</option>
+                                </select>
+                            </div>
+                            <p class="text-[11px] text-gray-500 italic">*e.g., 600g Antracol per 200L barrel or 120g per Bigha</p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black uppercase text-gray-700">Target Standard Application Basis:</label>
+                            <select id="calc-basis" onchange="calculateDosage()" class="w-full bg-white border border-gray-300 rounded-xl p-3 font-extrabold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                                <option value="barrel">Per 200L Water Barrel / Drum</option>
+                                <option value="bigha">Per Bigha Area</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Calculator Output Results -->
+                    <div class="bg-fpoGreen text-white p-6 rounded-2xl shadow-md space-y-6 flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <h4 class="font-extrabold text-amber-300 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-square-poll-vertical"></i> Total Spray Requirements
+                            </h4>
+
+                            <div class="bg-white/10 p-4 rounded-xl space-y-1">
+                                <span class="text-xs text-emerald-200 font-bold block">Estimated Water Volume Needed:</span>
+                                <span id="out-water" class="text-2xl font-black text-white">1,000 Liters</span>
+                                <span id="out-containers" class="text-xs text-emerald-300 block font-semibold">(5 Barrels of 200L / ~67 Knapsack Pumps)</span>
+                            </div>
+
+                            <div class="bg-amber-400 text-fpoGreen p-4 rounded-xl space-y-1 shadow-sm">
+                                <span class="text-xs font-black uppercase block tracking-wider">Total Required Chemical Product:</span>
+                                <span id="out-chem" class="text-3xl font-black">3,000 Grams (3.0 kg)</span>
+                                <span id="out-per-pump" class="text-xs font-extrabold block text-emerald-950">(~45g chemical per 15L pump)</span>
+                            </div>
+                        </div>
+
+                        <div class="text-[11px] text-emerald-200 border-t border-white/20 pt-3">
+                            <p class="font-bold"><i class="fa-solid fa-lightbulb text-amber-300 mr-1"></i> FPO Field Tip:</p>
+                            <p>Always prepare a concentrated mother solution in a 5L bucket before pouring into the 200L water tank. Add 5ml of <strong>Magstick Silicon Sticker</strong> per 15L pump during monsoon sprays.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- PRODUCT DETAIL MODAL -->
+    <div id="product-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-200 space-y-0 transform transition-all my-8 max-h-[90vh] flex flex-col">
+            <div class="bg-fpoGreen text-white p-6 flex justify-between items-start shrink-0">
+                <div id="modal-header-section" class="space-y-1">
+                    <span id="modal-cat" class="bg-amber-400 text-fpoGreen font-black text-[10px] uppercase px-3 py-1 rounded-full tracking-wider">Crop Protection</span>
+                    <h3 id="modal-title" class="text-2xl font-black leading-tight">Product Name</h3>
+                    <p id="modal-brand" class="text-xs text-emerald-200 font-bold flex items-center gap-1.5 mt-1">
+                        <i class="fa-solid fa-building text-amber-300"></i> <span id="modal-company">Manufacturer</span>
+                    </p>
+                </div>
+                <button onclick="closeModal()" class="text-white/80 hover:text-white text-3xl font-bold transition">&times;</button>
+            </div>
+            
+            <div class="p-6 space-y-4 overflow-y-auto custom-scrollbar flex-grow">
+                <div class="flex justify-between items-center bg-emerald-50 border border-emerald-200 p-4 rounded-2xl">
+                    <div>
+                        <span class="text-[11px] font-bold text-gray-500 uppercase block">SKU Code & Pack Size</span>
+                        <span id="modal-sku" class="text-sm font-black text-emerald-900">SKU-001 (500g)</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[11px] font-bold text-gray-500 uppercase block">FPO Store Wholesale Price</span>
+                        <span id="modal-price" class="text-2xl font-black text-amber-600">₹445</span>
+                    </div>
+                </div>
+
+                <div id="modal-seed-section" class="hidden space-y-3">
+                    <div class="space-y-1">
+                        <span class="text-xs font-black text-emerald-800 uppercase tracking-wider">Seed Rate</span>
+                        <p id="modal-seed-rate" class="text-xs sm:text-sm font-bold text-emerald-950 bg-emerald-50 p-3 rounded-xl border border-emerald-200"></p>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-black text-amber-800 uppercase tracking-wider">Crop Characteristics</span>
+                        <p id="modal-seed-characteristics" class="text-xs sm:text-sm text-gray-700 leading-relaxed bg-amber-50 p-3 rounded-xl border border-amber-200"></p>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-black text-red-700 uppercase tracking-wider">Disease Resistance</span>
+                        <p id="modal-seed-resistance" class="text-xs sm:text-sm text-red-900 leading-relaxed bg-red-50 p-3 rounded-xl border border-red-200"></p>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-black text-blue-800 uppercase tracking-wider">Breeding Method</span>
+                        <p id="modal-seed-breeding" class="text-xs sm:text-sm text-gray-700 leading-relaxed bg-blue-50 p-3 rounded-xl border border-blue-200"></p>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-black text-fpoGreen uppercase tracking-wider">Seed Type</span>
+                        <p id="modal-seed-type" class="text-xs sm:text-sm font-bold text-gray-900 bg-gray-100 p-3 rounded-xl border border-gray-200"></p>
+                    </div>
+                </div>
+
+                <div id="modal-machinery-section" class="hidden space-y-3">
+                    <div class="space-y-1">
+                        <span class="text-xs font-black text-purple-800 uppercase tracking-wider">Power, Engine or Passive System</span>
+                        <p id="modal-mach-power" class="text-xs sm:text-sm font-bold text-purple-950 bg-purple-50 p-3 rounded-xl border border-purple-200"></p>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-black text-blue-800 uppercase tracking-wider">Capacity, Size or Specifications</span>
+                        <p id="modal-mach-specs" class="text-xs sm:text-sm text-gray-700 leading-relaxed bg-blue-50 p-3 rounded-xl border border-blue-200"></p>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-black text-emerald-800 uppercase tracking-wider">Farm Use or Target</span>
+                        <p id="modal-mach-use" class="text-xs sm:text-sm text-gray-700 leading-relaxed bg-emerald-50 p-3 rounded-xl border border-emerald-200"></p>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-black text-amber-800 uppercase tracking-wider">Performance or Operation</span>
+                        <p id="modal-mach-performance" class="text-xs sm:text-sm text-gray-700 leading-relaxed bg-amber-50 p-3 rounded-xl border border-amber-200"></p>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-black text-red-700 uppercase tracking-wider">Care, Maintenance or Safety</span>
+                        <p id="modal-mach-care" class="text-xs sm:text-sm text-red-900 leading-relaxed bg-red-50 p-3 rounded-xl border border-red-200"></p>
+                    </div>
+                </div>
+
+                <div id="modal-tech-section" class="space-y-1">
+                    <span id="modal-tech-label" class="text-xs font-black text-gray-500 uppercase tracking-wider block">Active Chemical Formulation / Technical</span>
+                    <p id="modal-tech" class="text-xs sm:text-sm font-bold text-gray-900 bg-gray-100 p-3 rounded-xl border border-gray-200">Active Formulation</p>
+                </div>
+
+                <!-- Dosage Per Bigha & Barrel -->
+                <div id="modal-dosage-section" class="space-y-1 bg-emerald-50/80 p-3.5 rounded-xl border border-emerald-200">
+                    <span class="text-xs font-black text-emerald-900 uppercase tracking-wider block flex items-center gap-1.5">
+                        <i class="fa-solid fa-vial-circle-check text-emerald-600"></i> <span id="modal-dosage-label">Recommended Dosage (Per Bigha & Barrel)</span>
+                    </span>
+                    <p id="modal-dosage" class="text-xs sm:text-sm font-extrabold text-emerald-950">120g per Bigha (30g per 15L pump / 600g per 200L barrel)</p>
+                    <span class="text-[10px] text-emerald-700 font-semibold block italic">*Himachal Standard: 1 Acre = 5 Bighas</span>
+                </div>
+
+                <!-- Target Problems -->
+                <div id="modal-targets-section" class="space-y-1">
+                    <span class="text-xs font-black text-gray-500 uppercase tracking-wider block flex items-center gap-1.5">
+                        <i class="fa-solid fa-bullseye text-red-500"></i> <span id="modal-targets-label">Target Pests, Diseases & Deficiencies</span>
+                    </span>
+                    <p id="modal-targets" class="text-xs sm:text-sm font-bold text-red-900 bg-red-50/70 p-3 rounded-xl border border-red-200">Apple Scab, Alternaria Leaf Spot, Die-Back, Canker</p>
+                </div>
+
+                <!-- Key Benefits -->
+                <div id="modal-benefits-section" class="space-y-1">
+                    <span class="text-xs font-black text-gray-500 uppercase tracking-wider block flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check text-fpoGreen"></i> <span id="modal-benefits-label">Key Field Benefits</span>
+                    </span>
+                    <p id="modal-benefits" class="text-xs text-gray-700 leading-relaxed bg-blue-50/70 p-3 rounded-xl border border-blue-200 font-medium">Provides superior contact disease control while supplying essential Zinc to improve leaf greenness and vigor.</p>
+                </div>
+
+                <!-- Safety Precautions & PHI -->
+                <div id="modal-precautions-section" class="space-y-1">
+                    <span class="text-xs font-black text-amber-800 uppercase tracking-wider block flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> <span id="modal-precautions-label">Safety Precautions & PHI Guidelines</span>
+                    </span>
+                    <p id="modal-precautions" class="text-xs text-gray-700 leading-relaxed bg-amber-50/80 p-3 rounded-xl border border-amber-200 font-medium">Do not spray during full bloom. Ensure uniform coverage on under-leaf. Observe 14-day Pre-Harvest Interval (PHI).</p>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button onclick="closeModal()" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl text-xs uppercase tracking-wider transition">Close</button>
+                    <button onclick="closeModal(); switchTab('catalog');" class="w-full py-3 bg-fpoGreen hover:bg-teal-900 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-store"></i> View in Store Catalog
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-fpoGreen text-white text-center py-6 text-xs font-semibold border-t border-emerald-800 mt-12">
+        Dev Bhoomi FPO Agriculture Advisory & Technical Store | Supporting Farmers Across Himachal Pradesh | © 2026 All Rights Reserved.
+    </footer>
+
+    <!-- Crop advisory database export -->
+    <script src="crop_guide_data.js"></script>
+    <script src="fertilizers_and_nutrients_data.js"></script>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // -------------------------------------------------------------
+        // Verified catalog generation. Source: Live Price list, with guide details
+        // merged by trade name and pack. No synthetic or duplicate product rows.
+        // -------------------------------------------------------------
+        const productsData = [];
+
+        function generateDataset() {
+            const catalogText = `
+1|Fungicide|INDOFIL|Avtar|500gm|520
+2|Fungicide|BAYER|ANTRACOL|500 gm|445
+3|Fungicide|BAYER|ANTRACOL|1kg|860
+4|Fungicide|SYENGENTA|AMISTAR TOP|100ml|565
+5|Fungicide|SYENGENTA|AMISTAR TOP|200ml|1050
+6|Fungicide|BASF|Acrobat|200gm|1400
+7|Fungicide|IFFCO-MC|Aniki|500gm|320
+8|Fungicide|TATA RALLIS|BLITOX|500 gm|515
+9|Fungicide|CRYSTAL|BAVISTIN|100 gm|136
+10|Fungicide|CRYSTAL|BAVISTIN|500gm|642
+11|Fungicide|CRYSTAL|BLUE COPPER|500 gm|580
+12|Fungicide|BANDHAN|Bancozeb 75|250gm|100
+13|Fungicide|BANDHAN|Bancozeb 75|500gm|220
+14|Fungicide|INDOFIL|Boon|100 gm|210
+15|Fungicide|BANDHAN|Baaf|500gm|420
+16|Fungicide|ADAMA|Custudia|100ml|400
+17|Fungicide|INDOFIL|Companion|500 gm|330
+18|Fungicide|ADAMA|Cymagan|600gm|840
+19|Fungicide|Corteva|Curzate|300g|600
+20|Fungicide|UPL|Electron|100ml|310
+21|Fungicide|PPI|Electron|200ml|550
+22|Fungicide|SYENGENTA|FOLIO GOLD|500 ml|1025
+23|Fungicide|IPL|Sanjeevni|1kg|350
+24|Fungicide|Nagarjun|Index 100 gm (MYCLOBUTANIL 10 %WP)|100 gm|210
+25|Fungicide|SYENGENTA|KAVACH FLO|400 ml|765
+26|Fungicide|Corteva Agriscience|Kocide tm 2000|250gm|650
+27|Fungicide|INDOFIL|MATCO|250 gm|370
+28|Fungicide|INDOFIL|MATCO|500gm|740
+29|Fungicide|INDOFIL|MATCO|1kg|1400
+30|Fungicide|INDOFIL|M-45|500GM|250
+31|Fungicide|ADAMA|Mitalik|300gm|780
+32|Fungicide|JU|Mahakal|40gm|370
+33|Fungicide|BASF|Merivon|40ml|670
+34|Fungicide|BASF|Merivon|80ml|1340
+35|Fungicide|Fertiglobal|Mantus|200ml|430
+36|Fungicide|BANDHAN|Metabanco|500gm|400
+37|Fungicide|BAYER|NETIVO|100 gm|880
+38|Fungicide|BASF|Polyram|500gm|560
+39|Fungicide|SYENGENTA|RIDOMIL GOLD|250 gm|440
+40|Fungicide|SYENGENTA|RIDOMIL GOLD|500 gm|850
+41|Fungicide|SYENGENTA|RIDOMIL GOLD|1 Kg|1660
+42|Fungicide|Biostadt|Roko|100gm|180
+43|Fungicide|Tropical Agro|Tagron 35 WS|100gm|200
+44|Fungicide|TATA RALLIS|Takkat|250gm|360
+45|Fungicide|UPL|SAAF|500 gm|425
+46|Fungicide|UPL|SAAF|1kg|820
+47|Fungicide|SYENGENTA|SCORE|100ml|425
+48|Fungicide|ADAMA|Shamir|500ml|560
+49|Fungicide|Fill Industries|Sobhla|200ml|610
+50|Fungicide|Will Wood|ValXtra|250ml|380
+51|Insectisides|SYENGENTA|ALIKA|80ML|250
+52|Insectisides|SYENGENTA|Actara|5 gm|20
+53|Insectisides|UPL|Apache|160g (1packet)|1100
+54|Insectisides|BANDHAN|Ban Choloro|250ml|160
+55|Insectisides|BANDHAN|Bamida|250ml|340
+56|Insectisides|SYENGENTA|CURACRON|250ml|240
+57|Insectisides|SYENGENTA|CURACRON|500ml|470
+58|Insectisides|SARTHI|Casio|100ml|300
+59|Insectisides|Nagarjuna|Cannon|250ml|310
+60|Insectisides|CORTEVA|Delegate|100ml|1320
+61|Insectisides|Paras(PPI)|Danzin|133.2 gm|450
+62|Insectisides|BASF|Exponus|17ml|1040
+63|Insectisides|BASF|Exponus|25 ml|1500
+64|Insectisides|BANDHAN|Grill|100 gm|330
+65|Insectisides|Agrovet|Gracia|40ml|750
+66|Insectisides|Agrovet|Gracia|80ml|1550
+67|Insectisides|Bayer|Jump|2gm|60
+68|Insectisides|BANDHAN|Lrv Superb|100 ml|550
+69|Insectisides|BANDHAN|Lrv Superb|250ML|1200
+70|Insectisides|SARTHI|Laku mu|100ml|400
+71|Insectisides|Sikko Industries|Neemsik|500ml|1850
+72|Insectisides|Sikko Industries|Neemsik|1 liter|3150
+73|Insectisides|PARIJAT|Perform|100gm|320
+74|Insectisides|NAGARJUN|PROFEX SUPER|500 ml|430
+75|Insectisides|NAGARJUN|PROFEX SUPER|250ml|225
+76|Insectisides|NAGARJUN|PROFEX SUPER|1Ltr|800
+77|Insectisides|TATA RALLIS|SUMMIT|100 ml|1225
+78|Insectisides|BAYER|SOLOMON|100 ml|310
+79|Insectisides|SYENGENTA|SIMODIES|120 ml|1125
+80|Insectisides|SYENGENTA|SIMODIES|240ml|2225
+81|Insectisides|BANDHAN|Seaze Advance - 50ML|50 ml|950
+82|Insectisides|PI|Snailkill|1Kg|1320
+83|FERTILIZER|Ann Data|19:19:19|1kg|180
+84|FERTILIZER|BANDHAN|B-MYCO PRIME|5 kg Bucket|600
+85|FERTILIZER|BANDHAN|Builder + Bucket|10 kg|700
+86|FERTILIZER|BANDHAN|BG- Potash|10kg Bag|600
+87|FERTILIZER|BANDHAN|BG- Potash|25kg Bag|1350
+88|FERTILIZER|BANDHAN|Builder +|25KG|1350
+89|FERTILIZER|SCL Commercial India|Foliarel 21|250GM|100
+90|FERTILIZER|BANDHAN|Calcimax|500ml|430
+91|FERTILIZER|BANDHAN|Calzib3X|500ml|520
+92|FERTILIZER|Yara Liva|Yara Liva (Nitrabor)|20kg|1500
+93|FERTILIZER|CORAMANDEL|19:19:19|1 kg|220
+94|FERTILIZER|CORAMANDEL|00:52:34|1 kg|270
+95|FERTILIZER|CORAMANDEL|00:00:50|1 kg|220
+96|FERTILIZER|AGRIVILLE LIFE SCIENCE PRIVATE LIMITED|Magnesium|1 kg|100
+97|FERTILIZER|AGRIVILLE LIFE SCIENCE PRIVATE LIMITED|jawa|2 kg|300
+98|FERTILIZER|Katyayani|EPSOM SALT(MAGNESIUM SULPHATE)|1kg|300
+99|FERTILIZER|CORAMANDEL|13:00:45|1 kg|210
+100|Nutrition|AGRIVILLE LIFE SCIENCE PRIVATE LIMITED|AGRIVILLE SUPERMIX (Cheleated calcium boron )|250gm|350
+101|Nutrition|AGRIVILLE LIFE SCIENCE PRIVATE LIMITED|AGRIVILLE BORON (DI-SODIUM OCTA BORATE TERAHYDRATE 20% BORON)|250GM|150
+102|Nutrition|AGRIVILLE LIFE SCIENCE PRIVATE LIMITED|AGRIVILLE CALCIUM (EDTA CALCIUM 10% ) {CHELATED CALCIUM}|100GM|170
+103|Nutrition|BANDHAN|HUMI Mix|500ml|330
+104|Nutrition|Kisan Organics Pvt. Ltd.|Kisan Borocal|250gm|250
+105|Nutrition|Kisan Organics Pvt. Ltd.|Kisan K- Cal|100gm|130
+106|Tonic|Biostadt|Amaze- XL|500ml|870
+107|Tonic|BANDHAN|Advance Bloomer|500 ml|420
+108|Tonic|BANDHAN|Advance Bloomer|1 ltr|800
+109|Tonic|BANDHAN|B-Vita|500 ml|450
+110|Tonic|BANDHAN|B-Vita|1 Ltr|850
+111|Tonic PGR|SARTHI|Miracle Plus|50ml|530
+112|Tonic PGR|BAYER|Planofix|100ml|180
+113|Tonic|S.N Crop Sciences|Root Master|250gm|650
+114|Tonic|IPL|5G|500 ml|980
+115|Tonic|IPL|5G|1 ltr|1890
+116|Miticides|BANDHAN|Deco|250ml|950
+117|Miticides|BANDHAN|Deco|500ml|1580
+118|Miticides|SARTHI|Eton|250ml|700
+119|Miticides|PI|Simbaa|250ml|470
+120|Herbicides|Jarman Agro|A-Star|1Ltr|450
+121|Herbicides|Fill Industries Pvt.Ltd|Alto|100ml|270
+122|Herbicides|Fill Industries Pvt.Ltd|Filquat|500ml|250
+123|Herbicides|HPM|Heera 77|500ml|250
+124|Herbicides|ADAMA|Paranex|1liter|550
+125|Herbicides|AGRIVILLE LIFE SCIENCE PRIVATE LIMITED|Pendiville|1liter|600
+126|Herbicides|AGRIVILLE LIFE SCIENCE PRIVATE LIMITED|Pendiville|500 ml|350
+127|Herbicides|Paras Pesticides Industries|Titanic|1ltr|450
+128|SEED|Ashoka Seed|AFA-15 (Peas)|1kg|200
+129|SEED|Pahuja Seeds|IMPROVED PEAS MAXIMA 3636 (Peas)|1Kg|290
+130|SEED|NRL Seeds|NRL -8080 Plus (Peas)|1Kg|240
+131|SEED|Advanta|GS 10 (Peas)|1Kg|350
+132|SEED|Ashoka Seed|AFA-10 (Peas)|1Kg|320
+133|SEED|Syngenta|Mucio (Peas)|1Kg|320
+134|SEED|Kalash|BSS-816|1 piece|700
+135|SEED|Ashoka|Bean Rainbow (bush Beans)|500 gm|390
+136|SEED|Organic|Brinjal Garlic|1kg|180
+137|SEED|ANVAY|Corn Kanchanmoti|1 kg|110
+138|SEED|Anvay Seeds|Corn-Maize Kanchan Moti|4kg|440
+139|SEED|Tropica Seed|Chilli Kaali|10 gm|430
+140|SEED|Anvay Beej Company|Discovery|1kg|140
+141|SEED|Ashoka Seed|Fast Grow (Coriander)|500gm|240
+142|SEED|Ashoka Seed|Fast Grow (Coriander)|1kg|460
+143|SEED|Ashoka Seed|Coriander Vijetha (cut )|500grm|200
+144|SEED|Advanta (CAULIFLOWER )|GOLDEN 385|1 piece|630
+145|SEED|SYENGENTA (TOMATO)|HIMSONA|1 piece (3500 seeds)|800
+146|SEED|Gayathri Seed|Hybrid Surgum Knnar SSG Red|5KG|340
+147|SEED|SYENGENTA|ivory white|250gm|550
+148|SEED|SEMINIS (Beans)|Moraleda|500gm|1050
+149|SEED|Ashoka|Pole Beans Belli|500 gm|850
+150|SEED|CM|Pole Beans Rani|500gm|500
+151|SEED|Himalaya Hybrid Seeds|Peas Seeds GW-10|1 kg|140
+152|SEED|Truegenic|Pole Bean Madhubala|500 gm|850
+153|SEED|Green Land|Rajmah S-27|1 kg|265
+154|SEED|Global seeds|Rosebella|100gm|850
+155|SEED|SAKata company (BROCCOLI)|SAKI|1 piece (2000 Seeds)|970
+156|SEED|Red creole|Stark Ayres|100gm|1000
+157|SEED|Aviva|SEEDLESS|1 (PECKET) 10 gm|540
+158|SEED|UNISEM|USM RANI|1 piece|230
+159|SEED|Starke Ayres|Onion Red Creole|100 grm|1000
+160|SEED|Global seeds|F-1 Hybrid (Rosabella Onion )|10 grm|180
+161|SEED|Global seeds|Onion N-53 (Dark Red ) Naasik|100 grm|160
+162|SEED|Takii Seed|Hybrid Onion T 821|10 grm|230
+163|SEED|BAYER|Ceylon Hybrid Onion|50grm|950
+164|SEED|Global seeds|Onion Improved (Roja)|100 grm|180
+242|SEED|Ashoka Seed|Methi (Fenugreek)|100gm|0
+243|SEED|Green Land|Imported Turnip Rose (Shalgam)|10gm|0
+244|SEED|Green Land|Hybrid Radish Snow White|10gm|0
+245|SEED|Green Land|Palak Komal|40gm|0
+246|SEED|Global Seeds|Coriander|25gm|0
+165|Sticky Traps|A4 yellow both side sticky trap pack of 12|A4 Yellow Double-Side Trap|12 Pack|270
+166|Sticky Traps|A4 Blue both side sticky trap pack of 12|A4 Blue Double-Side Trap|12 Pack|260
+167|Sticky Traps|A4 YELLOW BOTH SIDE BUTTER PAPER PACK OF 50|A4 Yellow Butter Paper Trap|50 Pack|1130
+168|Sticky Traps|A4 blue both side sticky trap pack of 50|A4 Blue Sticky Trap|50 Pack|1130
+169|Sticky Traps|A4 white both side butter paper sheet (pack of 50)|A4 White Butter Paper Sheet|50 Pack|1130
+170|Sticky Traps|Chipku|A5 yellow sticky trap pack of 25|25 Pack|170
+171|Sticky Traps|Chipku|A5 blue sticky trap pack of 25|25 Pack|170
+172|Sticky Traps|Chipku|A5 yellow sticky trap pack of 10|10 Pack|70
+173|Sticky Traps|Chipku|A5 blue sticky trap pack of 10|10 Pack|60
+174|Lapeta pipe|Iris Polymers|Lapeta Pipe 60m (63mm)|60Mtr (63mm)|2350
+175|Lapeta pipe|Iris Polymers|Lapeta Pipe 60m (75mm)|60Mtr (75mm)|2750
+176|Lapeta pipe|Iris Polymers|Lapeta Pipe 60m (90mm)|60Mtr (90mm)|3350
+177|Machinery|Balwaan|Balwaan Battery Sprayer BS-22D|20 ltr|3250
+178|Machinery|Balwaan|Balwaan Gold Series Sprayer BS-30G|20 ltr|4900
+179|Machinery|Balwaan|Balwaan Gold Series Li-Ion BS-30GL|20 ltr|5500
+180|Machinery|Balwaan|Balwaan Side Pack Brush Cutter BX-35|1 Piece|9700
+181|Machinery|Balwaan|BS-20 Single Motor|20ltr|2700
+182|Machinery|Balwaan|BS-20M|20ltr|2100
+183|Machinery|Balwaan|BS-21 2 in1|18ltr|3100
+184|Machinery|Balwaan|IMBA|212CC|21000
+185|Machinery|Balwaan|Brush Cutter|B*35|9700
+186|Machinery|Balwaan|Earth Auger BE-52|52cc|15000
+187|Machinery|Balwaan|Earth Auger BE-63|63cc|16000
+188|Machinery|Balwaan|Earth Auger BE-63T|63cc|19000
+189|Machinery|KOEL|Electric Motor Pump 0.5 HP Aluminium|0.5 HP|3585
+190|Machinery|KOEL|Electric Motor Pump 0.5 HP Copper|0.5 HP|4174
+191|Machinery|KOEL|Electric Motor Pump 1 HP Aluminium|1 HP|4254
+192|Machinery|KOEL|Electric Motor Pump 1 HP Copper|1 HP|4732
+193|Machinery|Balwaan|Hose Reel|Up to 100m|2000
+194|Machinery|Balwaan|Hose Reel|Up to 200m|3000
+195|Machinery|Balwaan|Power Weeder BW-25|1 Unit|19500
+196|Machinery|Balwaan|Power Weeder BP-650|1 Unit|40000
+197|Machinery|Balwaan|Power Weeder BP-700|1 Unit|52000
+198|Machinery|Neptune|Neptune NF-787 Power Sprayer|1 HP (4 Stroke)|9500
+199|Machinery|Balwaan|Spray Gun|45cm|290
+200|Machinery|Balwaan|Spray Gun|60cm|390
+201|Machinery|Balwaan|Spray Gun|90cm|430
+202|Machinery|Balwaan|Spray Gun|60cm-B|1550
+203|Machinery|Balwaan|Spray Gun|60CM-P|850
+204|Machinery|Balwaan|8.5mm Pipe|30m|1900
+205|Machinery|Balwaan|8.5mm Pipe|50m|2790
+206|Machinery|Balwaan|8.5mm Pipe|100m|4900
+207|Machinery|Balwaan|10mm Pipe|50m|3300
+208|Machinery|Balwaan|10mm Pipe|100m|6200
+209|Machinery|VST|50 GE Power Weeder|1 piece|51000
+210|Machinery|VST|55 GE Power Weeder|1 piece|47000
+211|Machinery|VST|35 GE Power Weeder|1 piece|36000
+212|Machinery|Balwaan|SP-80B|8ltr|3100
+213|Mulching Sheet|Mayur Impero|30*20 (800 Mtr)|30*20|3350
+214|Mulching Sheet|Mayur Impero|30*25 (800 Mtr)|30*25|4050
+215|Mulching Sheet|Mayur Impero|30*30 (800 Mtr)|30*30|5000
+216|Mulching Sheet|Mayur Impero|39*20 (400 Mtr)|39*20|2500
+217|Mulching Sheet|Mayur Impero|39*25 (400 Mtr)|39*25|2800
+218|Mulching Sheet|Mayur Impero|39*30 (400 Mtr)|39*30|3300
+219|Mulching Sheet|Mayur Impero|48*20 (400 Mtr)|48*20|3000
+220|Mulching Sheet|Mayur Impero|48*25 (400 Mtr)|48*25|3500
+221|Mulching Sheet|Mayur Impero|48*30 (400 Mtr)|48*30|4150
+222|Sutli|CM 777|Sutli|25kg|1500
+223|Sutli|Honda Sutli|Sutli|25 kg|1300
+224|Sutli|Honda City Sutli|Sutli|25kg|1450
+225|Equipment|Biome Technology Pvt.Ltd.|Soilometer Advance Kit|1 kit|5100
+226|Stickers|SARTHI|Magstick STICKER / SPREDER|250 ML|185
+227|Stickers|SARTHI|Magstick STICKER / SPREDER|500 ML|260
+228|Stickers|BANDHAN|Magic 3|100 ml|110
+229|Stickers|SARTHI|Silstick|500 ML|440
+230|Stickers|SARTHI|Silstick|1 ltr|800
+231|Stickers|BANDHAN|Spredonix|250ML|430
+232|Antibiotic|Hindustan Antibiotics Ltd.|Streptocycline|6gm|50
+233|Antibiotic|BANDHAN|Ban-Mycin|250ml|230
+234|Antivirus|PPI PARAS|Shield|50g|370
+235|Antivirus|Berrysun's|Vc-100|500gm|900
+236|Antivirus|Berrysun's|Vc-100|1kg|1650
+237|NET|SARTHI|Agricultural Net 8*30|8*30|6240
+238|NET|SARTHI|Agricultural Net 9*30|9*30|7020
+239|NET|SARTHI|Agricultural Net 10*10|10*10|2600
+240|NET|SARTHI|Agricultural Net 10*50|10*50|13000
+241|NET|SARTHI|Agricultural Net 10*30|10*30|7800
+`.trim();
+
+            const chemicalDetails = {
+                "Avtar": ["Hexaconazole 4% + Zineb 68% WP", "Dual contact and systemic fungicide for leaf spots, scab and rust.", "Check crop label and observe local restrictions."],
+                "ANTRACOL": ["Propineb 70% WP", "Broad-spectrum contact fungicide for early blight and dieback.", "Use as label directed; avoid inhaling powder."],
+                "AMISTAR TOP": ["Azoxystrobin 18.2% + Difenoconazole 11.4% SC", "Systemic and preventive fungicide for mildew, blights and anthracnose.", "Mix well and follow label use directions."],
+                "Acrobat": ["Dimethomorph 50% WP", "Specialist fungicide for downy mildew and late blight.", "Use only for labeled crops and diseases."],
+                "BLITOX": ["Copper Oxychloride 50% WP", "Copper contact fungicide and bactericide.", "Avoid overdosing and observe protective interval."],
+                "BAVISTIN": ["Carbendazim 50% WP", "Systemic fungicide for wilt, rot, blast and powdery mildew.", "Follow label dose and safety precautions."],
+                "BLUE COPPER": ["Copper Oxychloride 50% WP", "Micronized copper contact fungicide.", "Avoid mixing with incompatible products."],
+                "Bancozeb 75": ["Mancozeb 75% WP", "Multi-site contact fungicide for blights and downy mildew.", "Wear mask and gloves during mixing."],
+                "Companion": ["Mancozeb 63% + Carbendazim 12% WP", "Dual contact and systemic fungicide.", "Observe pre-harvest and PHI directions."],
+                "KAVACH FLO": ["Chlorothalonil 40% + Difenoconazole 4% SC", "Rainfast dual-action fungicide for blights and fruit rot.", "Shake tank mixture continuously."],
+                "SAAF": ["Mancozeb 63% + Carbendazim 12% WP", "Combined contact and systemic fungicide.", "Use label dose and keep off treated foliage if restricted."],
+                "SCORE": ["Difenoconazole 25% EC", "Systemic fungicide for scab, mildew and leaf spots.", "Do not exceed label concentration."],
+                "ALIKA": ["Thiamethoxam 12.6% + Lambda-Cyhalothrin 9.5% ZC", "Dual insecticide for chewing and sucking pests.", "Use protective clothing and avoid drift."],
+                "Actara": ["Thiamethoxam 25% WG", "Systemic insecticide for aphids, thrips and whiteflies.", "Use only as labeled; protect pollinators."],
+                "CURACRON": ["Profenofos 50% EC", "Broad-spectrum insecticide with ovicidal action.", "Wear full protection and observe re-entry interval."],
+                "Lrv Superb": ["Emamectin Benzoate 1.9% EC", "Leaf-penetrating insecticide for borers and caterpillars.", "Measure accurately and avoid drift."],
+                "Perform": ["Emamectin Benzoate 5% SG", "Soluble granule insecticide for caterpillars and fruit borers.", "Dissolve granules fully before spraying."],
+                "SOLOMON": ["Imidacloprid 19.81% + Beta-Cyfluthrin 8.49% OD", "Oil-dispersion insecticide for sucking and chewing pests.", "Avoid spraying during active pollination."],
+                "Snailkill": ["Metaldehyde 2.5% bait pellets", "Ready-to-scatter molluscicide for snails and slugs.", "Keep away from children and animals."],
+                "19:19:19": ["NPK 19% N, 19% P2O5, 19% K2O", "Water-soluble balanced fertilizer.", "Dissolve completely before foliar or fertigation use."],
+                "Yara Liva (Nitrabor)": ["15.4% nitrate N + 25.6% CaO + 0.3% B", "Granulated calcium nitrate with boron.", "Use soil application rates on crop label."],
+                "EPSOM SALT(MAGNESIUM SULPHATE)": ["Magnesium Sulphate 9.6% Mg + 12% S", "Corrects magnesium deficiency and chlorosis.", "Confirm deficiency before foliar use."],
+                "Planofix": ["Alpha Naphthyl Acetic Acid 4.5% SL", "Plant growth regulator used to prevent premature fruit drop.", "Use only the exact labeled dose."],
+                "Heera 77": ["2,4-D Amine Salt 58% SL", "Selective post-emergence herbicide for broadleaf weeds.", "Avoid drift onto sensitive crops."],
+                "Magic 3": ["Organosilicone super-spreader", "Adjuvant that improves spread and penetration of spray mixes.", "Do not exceed adjuvant label dose."],
+                "Streptocycline": ["Streptomycin Sulphate 90% + Tetracycline Hydrochloride 10% SP", "Historical antibiotic bactericide; current state restrictions may apply.", "Check current local regulatory rules before use."],
+                "Ban-Mycin": ["Validamycin 3% L", "Fermentation-derived fungicide for sheath blight and damping-off.", "Use crop label dose and safety equipment."],
+                "Vc-100": ["Proprietary herbal / botanical extract powder", "Marketed for plant stress and immunity support; not a direct virus cure.", "Use with vector control and verify local label."]
+            };
+
+            const farmerChemicalGuide = {
+                "Avtar": {
+                    chemical:"Zineb 68% + Hexaconazole 4% WP",
+                    works:"Works outside on the leaf and inside plant sap to stop fungus growth.",
+                    problem:"Leaf spots, blight, powdery mildew, rust and sheath blight.",
+                    dosage:"2-2.5 gm per litre water; 35-40 gm per 15L pump; 400-500 gm/acre.",
+                    benefits:"Stops existing fungus and gives zinc nutrition for darker green leaves.",
+                    precautions:"Do not spray in hot afternoon sun. Wear a mask and gloves.",
+                    special:"Double protection: surface plus inside action, with built-in zinc."
+                },
+                "ANTRACOL": {
+                    chemical:"Propineb 70% WP",
+                    works:"Forms a protective leaf shield and releases zinc.",
+                    problem:"Early/late blight, fruit spots, scab and die-back.",
+                    dosage:"2-3 gm per litre; 30-45 gm per pump; 400-600 gm/acre.",
+                    benefits:"Keeps leaves green and helps prevent white residue on fruits.",
+                    precautions:"Do not mix with lime or Bordeaux mixture.",
+                    special:"Super-fine powder with readily available zinc."
+                },
+                "AMISTAR TOP": {
+                    chemical:"Azoxystrobin 18.2% + Difenoconazole 11.4% SC",
+                    works:"Moves through leaf sap, stopping fungus energy and growth.",
+                    problem:"Anthracnose, powdery mildew, blight and purple blotch.",
+                    dosage:"1 ml per litre; 15 ml per 15L pump; 200 ml/acre.",
+                    benefits:"Keeps crops green longer and improves fruit shine, size and yield.",
+                    precautions:"Harmful to fish. Do not spray on apple trees.",
+                    special:"Two medicines in one liquid for both cure and yield improvement."
+                },
+                "Acrobat": {
+                    chemical:"Dimethomorph 50% WP",
+                    works:"Moves into the leaf and breaks down water-mold fungi.",
+                    problem:"Downy mildew and late blight.",
+                    dosage:"1-1.5 gm per litre; 15-22 gm per pump; 200-300 gm/acre.",
+                    benefits:"Stops spore spread and becomes rain-safe in 1-2 hours.",
+                    precautions:"Mix with a contact fungicide such as Mancozeb to prevent resistance.",
+                    special:"Specialist medicine for tough downy mildew and late blight."
+                },
+                "BLITOX": {
+                    chemical:"Copper Oxychloride 50% WP",
+                    works:"Stays on the leaf surface and releases copper ions.",
+                    problem:"Bacterial leaf blight, citrus canker, late blight and fruit rot.",
+                    dosage:"2.5-3 gm per litre; 40-45 gm per pump; 500-600 gm/acre.",
+                    benefits:"Kills both fungal and bacterial diseases.",
+                    precautions:"Avoid peak flowering and very cold, damp weather.",
+                    special:"Trusted copper shield for fungi and bacteria together."
+                },
+                "BAVISTIN": {
+                    chemical:"Carbendazim 50% WP",
+                    works:"Absorbed by roots and leaves and travels inside the plant.",
+                    problem:"Wilt, root rot, powdery mildew, anthracnose and seed-borne disease.",
+                    dosage:"Spray/drench 1-2 gm/L; 15-30 gm/pump. Seed treatment 2 gm/kg seed.",
+                    benefits:"Suitable for seed coating, root drenching and foliar spraying.",
+                    precautions:"Rotate with other fungicides to prevent resistance.",
+                    special:"All-purpose medicine for seed, root and leaf protection."
+                },
+                "Bancozeb 75": {
+                    chemical:"Mancozeb 75% WP",
+                    works:"Creates a protective coating and supplies manganese and zinc.",
+                    problem:"Early/late blight, downy mildew, leaf spots, rust and anthracnose.",
+                    dosage:"2-2.5 gm per litre; 30-40 gm per pump; 400-500 gm/acre.",
+                    benefits:"Low-cost broad-spectrum protection with Mn + Zn nutrition.",
+                    precautions:"Keep the packet closed and dry.",
+                    special:"Best partner with systemic fungicides to prevent resistance."
+                },
+                "SAAF": {
+                    chemical:"Carbendazim 12% + Mancozeb 63% WP",
+                    works:"One part cures inside plant tissue while the other protects the leaf surface.",
+                    problem:"Leaf spot, blast, blight, rust, collar rot and seed/root rot.",
+                    dosage:"2 gm per litre; 30 gm per pump; 400-500 gm/acre.",
+                    benefits:"Fast plus long-lasting protection with manganese and zinc.",
+                    precautions:"Wear a mask and gloves. Keep away from ponds.",
+                    special:"Trusted all-round fungicide for foliar, seed and nursery use."
+                },
+                "SCORE": {
+                    chemical:"Difenoconazole 25% EC",
+                    works:"Absorbs through leaves and stops fungal cell-wall formation.",
+                    problem:"Anthracnose, Alternaria spot, scab, powdery mildew and purple blotch.",
+                    dosage:"0.5-1 ml per litre; 8-15 ml per pump; 100-200 ml/acre.",
+                    benefits:"Cures existing spots quickly and is gentle on delicate crops.",
+                    precautions:"Rotate with another fungicide group.",
+                    special:"High-purity liquid penetrates waxy leaves rapidly."
+                },
+                "ALIKA": {
+                    chemical:"Thiamethoxam 12.6% + Lambda-Cyhalothrin 9.5% ZC",
+                    works:"Contact part knocks pests down; systemic part gives lasting protection.",
+                    problem:"Aphids, jassids, thrips, whiteflies and young caterpillars.",
+                    dosage:"0.4-0.5 ml per litre; 6-8 ml per pump; 80 ml/acre.",
+                    benefits:"Instant knockdown plus 12-15 days control.",
+                    precautions:"Very toxic to honeybees; do not spray on open flowers.",
+                    special:"Micro-capsule ZC technology gives slow, steady release."
+                },
+                "Actara": {
+                    chemical:"Thiamethoxam 25% WG",
+                    works:"Moves through leaves and roots and paralyzes sucking pests.",
+                    problem:"Planthopper, whitefly, aphids, jassids and citrus psylla.",
+                    dosage:"0.25-0.5 gm per litre; 4-8 gm per pump; 40-80 gm/acre.",
+                    benefits:"Pests stop sucking sap quickly and the crop looks healthier.",
+                    precautions:"Toxic to honeybees; avoid open flowers.",
+                    special:"Dissolves completely and reaches new leaves."
+                },
+                "CURACRON": {
+                    chemical:"Profenofos 50% EC",
+                    works:"Penetrates leaf layers and kills hidden pests and insect eggs.",
+                    problem:"Bollworms, leaf folders, semiloopers, aphids, thrips and whiteflies.",
+                    dosage:"2 ml per litre; 30 ml per pump; 400 ml/acre.",
+                    benefits:"Kills eggs and active pests in one spray.",
+                    precautions:"Strong odor. Spray with the wind at your back and wear a mask.",
+                    special:"Strong ovicidal action stops the next caterpillar generation."
+                },
+                "Perform": {
+                    chemical:"Emamectin Benzoate 5% SG",
+                    works:"Dissolves on leaves and paralyzes caterpillars after biting.",
+                    problem:"Fruit borer, pod borer, bollworm and cabbage/cauliflower caterpillars.",
+                    dosage:"0.4-0.5 gm per litre; 6-8 gm per pump; 80-100 gm/acre.",
+                    benefits:"Stops fruit and pod boring quickly.",
+                    precautions:"Wear gloves and keep away from fish ponds.",
+                    special:"Clean dissolving granules leave no nozzle blockage."
+                },
+                "SOLOMON": {
+                    chemical:"Beta-Cyfluthrin 8.49% + Imidacloprid 19.81% OD",
+                    works:"Oil medicine knocks pests down on contact and moves through sap.",
+                    problem:"Aphids, jassids, whiteflies, thrips, borers and semiloopers.",
+                    dosage:"0.8-1 ml per litre; 12-15 ml per pump; 160-200 ml/acre.",
+                    benefits:"Sticks to waxy leaves and gives rain-safe protection.",
+                    precautions:"Toxic to bees and fish. Follow waiting period before harvest.",
+                    special:"Oil dispersion spreads like oil on leaves."
+                },
+                "Snailkill": {
+                    chemical:"Metaldehyde 2.5% pellets",
+                    works:"Food-attractant bait destroys the slug/snail slime layer.",
+                    problem:"Snails and slugs eating seedlings, vegetables and orchard fruits.",
+                    dosage:"Scatter 2-3 kg/acre along borders and damp soil in the evening.",
+                    benefits:"Lures pests from hiding and works where normal insecticides fail.",
+                    precautions:"Keep away from dogs, cattle, poultry and children.",
+                    special:"Weather-resistant ready-to-scatter bait pellets."
+                },
+                "19:19:19": {
+                    chemical:"NPK 19% nitrogen, 19% phosphorus, 19% potassium",
+                    works:"Gives instant balanced food through leaves or drip roots.",
+                    problem:"Weak, slow-growing young crops and general nutrient shortage.",
+                    dosage:"Leaf spray 5 gm/L (75 gm/pump); drip 3-5 kg/acre.",
+                    benefits:"Boosts rapid leafy growth and dissolves completely.",
+                    precautions:"Do not mix in the same tank with calcium nitrate.",
+                    special:"Balanced 1:1:1 starter food for vegetative growth."
+                },
+                "Yara Liva (Nitrabor)": {
+                    chemical:"Calcium nitrate with Boron",
+                    works:"Nitrate nitrogen carries calcium and boron into roots and fruits.",
+                    problem:"Calcium/Boron deficiency, fruit splitting and blossom-end rot.",
+                    dosage:"Soil 15-25 kg/acre; drip 5-10 kg/acre.",
+                    benefits:"Improves fruit firmness, color and disease resistance.",
+                    precautions:"Keep bag dry. Never mix with sulfates or phosphates.",
+                    special:"World-standard granules supply nitrate-N, calcium and boron together."
+                },
+                "EPSOM SALT(MAGNESIUM SULPHATE)": {
+                    chemical:"Magnesium Sulphate",
+                    works:"Provides magnesium for chlorophyll and sulfur for crop nutrition.",
+                    problem:"Yellowing between leaf veins on older leaves.",
+                    dosage:"Leaf spray 5 gm/L (75 gm/pump); soil/drip 10-25 kg/acre.",
+                    benefits:"Turns pale yellow leaves green again within days.",
+                    precautions:"Do not mix with calcium nitrate or concentrated phosphate.",
+                    special:"Fast foliar greening tonic."
+                },
+                "Planofix": {
+                    chemical:"Alpha Naphthyl Acetic Acid (NAA) 4.5% SL",
+                    works:"Strengthens the flower/fruit stem joint.",
+                    problem:"Flower, bud and small-fruit drop.",
+                    dosage:"0.25 ml per litre; 4-4.5 ml per 16L pump.",
+                    benefits:"Stops premature shedding and helps larger, even fruit.",
+                    precautions:"Measure with a dropper. Overdose can curl leaves or cause drop.",
+                    special:"Low-cost hormone spray for flower and fruit retention."
+                },
+                "Heera 77": {
+                    chemical:"Glyphosate systemic post-emergence herbicide",
+                    works:"Enters weed leaves and moves down to roots and underground shoots.",
+                    problem:"Perennial and annual weeds on bunds, orchards and fallow plots.",
+                    dosage:"5-7 ml per litre; 80-100 ml per pump; about 1 litre/acre.",
+                    benefits:"Kills weeds from leaf tip to root.",
+                    precautions:"Keep spray mist away from green crop leaves.",
+                    special:"Built-in wetting agent helps it soak into waxy weeds."
+                },
+                "Magic 3": {
+                    chemical:"Organosilicone super-spreader",
+                    works:"Spreads spray drops and pulls medicine into leaf pores.",
+                    problem:"Spray failing to reach hidden mites, dense canopy or waxy leaves.",
+                    dosage:"0.25-0.3 ml per litre; 4-5 ml per pump; 50 ml/acre.",
+                    benefits:"Makes sprays rain-safe within 15 minutes.",
+                    precautions:"Do not exceed 5 ml per pump or mix with copper in hot sun.",
+                    special:"Silicone action reaches tiny leaf pores almost instantly."
+                },
+                "Streptocycline": {
+                    chemical:"Streptomycin Sulphate 90% + Tetracycline 10% SP",
+                    works:"Moves into plant sap and kills harmful plant bacteria.",
+                    problem:"Bacterial leaf blight, citrus canker and bacterial spots.",
+                    dosage:"6 gm pouch in 60-100 litres water.",
+                    benefits:"Stops watery bacterial burning and ooze.",
+                    precautions:"Use only for bacterial symptoms and avoid overuse.",
+                    special:"Dual-antibiotic powder made specifically for bacterial plant disease."
+                },
+                "Ban-Mycin": {
+                    chemical:"Validamycin 3% liquid",
+                    works:"Moves inside plant sap and stops bacterial/fungal multiplication.",
+                    problem:"Bacterial leaf spot, bacterial blight, sheath blight and blast.",
+                    dosage:"1.5-2 ml per litre; 25-30 ml per pump; 300-400 ml/acre.",
+                    benefits:"Clean liquid and gentle on flowers and young leaves.",
+                    precautions:"Do not mix with alkaline lime or Bordeaux mixture.",
+                    special:"Liquid antibiotic controls bacterial spots and fungal blast."
+                },
+                "Vc-100": {
+                    chemical:"Herbal antiviral & plant-defense complex",
+                    works:"Slows virus multiplication inside plant cells and supports new green growth.",
+                    problem:"Yellow vein mosaic, leaf-curl virus and stunted plants.",
+                    dosage:"2-2.5 gm per litre; 35-40 gm per pump; repeat after 10-12 days.",
+                    benefits:"Herbal, residue-free support for stressed crops.",
+                    precautions:"Also control whiteflies/thrips and use sticky traps.",
+                    special:"Natural formula suppresses virus symptoms safely."
+                }
+            };
+
+            const seedDetails = {
+                "AFA-15 (Peas)": ["30-35 kg/acre.", "Medium-tall bushy plants; long dark-green pods with 8-9 sweet grains; first picking in 60-65 days.", "Powdery mildew and early wilt tolerant. Pedigree and pure-line selection. Improved Open-Pollinated (OP) vegetable pea."],
+                "IMPROVED PEAS MAXIMA 3636 (Peas)": ["30-35 kg/acre.", "Vigorous plants with heavy double pods; 9-10 cm curved dark-green pods with 9-10 sweet seeds and high shelling.", "Good powdery mildew and Fusarium wilt tolerance. Single-plant progeny and pedigree selection. Research improved pea variety."],
+                "NRL -8080 Plus (Peas)": ["30-35 kg/acre.", "Medium-early maturity in 60-65 days; lush green pods retain freshness during transport.", "Powdery mildew and root-rot tolerant under normal drainage. Pure-line selection. Improved OP pea."],
+                "GS 10 (Peas)": ["30-35 kg/acre.", "High-yield main-season pea; 10-11 cm attractive dark-green pods with 9-10 bold sweet wrinkled grains; first picking 65-70 days.", "Strong powdery-mildew and rust tolerance. Controlled cross-breeding and pedigree selection. Improved research garden pea."],
+                "AFA-10 (Peas)": ["30-35 kg/acre.", "High-vigor plants with long, well-filled dark-green pods and sweet bold seeds; suitable for early and main Rabi.", "Powdery-mildew and Fusarium-wilt tolerant. Pedigree selection and line purification. Improved OP pea."],
+                "Mucio (Peas)": ["30-35 kg/acre.", "Uniform dark-green 8-9 cm pods with 8-9 sweet grains; high pod density and uniform maturity.", "Resistant/tolerant to powdery mildew and Fusarium wilt race 1. Targeted trait crossing and pedigree selection. Improved research garden pea."],
+                "Peas Seeds GW-10": ["30-35 kg/acre.", "Economical hardy pea with medium-long green pods and sweet grains; reliable in hill and plain winter sowings.", "Moderate powdery-mildew and cold-stress tolerance. Mass and pure-line selection. OP pea variety."],
+                "Bean Rainbow (bush Beans)": ["12-15 kg/acre.", "Compact self-standing bush plants; smooth round stringless green pods 13-15 cm; first picking 45-50 days.", "Tolerant to Bean Common Mosaic Virus and rust. Pure-line selection. Improved bush French bean (OP)."],
+                "Moraleda": ["10-12 kg/acre.", "Premium dark-green straight pencil-thin stringless pods 14-16 cm; concentrated set and good shelf life.", "High resistance to BCMV and anthracnose. Pedigree and disease-marker selection. Premium research bush French bean."],
+                "Pole Beans Belli": ["6-8 kg/acre; trellis support.", "Tall climbing vines with tender fleshy stringless green pods 16-18 cm and continuous multiple pickings.", "Tolerant to rust, angular leaf spot and mosaic virus. Pedigree selection. Improved pole/climbing French bean."],
+                "Pole Beans Rani": ["6-8 kg/acre; staking/net support.", "Vigorous climbing vines with long smooth tender green pods and good cluster bearing.", "Moderate rust and leaf-spot tolerance. Pure-line selection. OP pole bean."],
+                "Pole Bean Madhubala": ["6-8 kg/acre; trellis support.", "Strong climbing habit with heavy clusters and straight glossy tender pods 16-18 cm that stay crisp.", "Good BCMV and rust tolerance. Controlled crossing and progeny selection. Research improved pole bean."],
+                "Rosebella": ["3-4 kg/acre.", "Deep-red round globe bulbs with tight outer skin, single center, strong pungency and good storage.", "Tolerant to purple blotch and basal rot; low bolting. CMS hybridization. F1 hybrid red onion."],
+                "Red creole": ["3.5-4 kg/acre.", "Thick-flat deep-red bulbs with firm flesh, high dry matter and strong spicy flavor; long storage.", "Tolerant to pink root, purple blotch and storage rot. Recurrent bulb-to-seed selection. Short-day OP storage onion."],
+                "Stark Ayres": ["3.5-4 kg/acre.", "Thick-flat deep-red bulbs with firm flesh, high dry matter and strong spicy flavor; long storage.", "Tolerant to pink root, purple blotch and storage rot. Recurrent bulb-to-seed selection. Short-day OP storage onion."],
+                "Stark Ayres": ["3.5-4 kg/acre.", "Deep-red tight-necked hard bulbs with protective outer scales; suitable for Rabi/late-Kharif storage.", "Strong pink-root and post-harvest decay tolerance. Recurrent bulb selection. Short-day OP onion."],
+                "Onion Red Creole": ["3.5-4 kg/acre.", "Deep-red tight-necked hard bulbs with multiple outer scales; suited to Rabi/late-Kharif and long storage.", "Strong pink-root and storage-decay tolerance. Recurrent bulb selection. Short-day OP onion."],
+                "F-1 Hybrid (Rosabella Onion )": ["3-3.5 kg/acre.", "Uniform glossy dark-red globe bulbs with thin neck; high marketable bulb percentage and uniform size.", "Tolerant to purple blotch, Stemphylium blight and bolting. CMS-based F1 hybrid breeding. F1 hybrid onion seed."],
+                "Onion N-53 (Dark Red ) Naasik": ["3.5-4 kg/acre.", "Classic Kharif/early-Rabi dark-red globe onion; 90-100 days after transplanting; medium pungency.", "Adapted to humidity with moderate purple-blotch tolerance. Mass selection. OP Kharif red onion."],
+                "Hybrid Onion T 821": ["2.5-3 kg/acre.", "Japanese hybrid; uniform round firm red bulbs with tight skin, minimal doubles/splits and strong transport quality.", "High tolerance to pink root, Fusarium basal rot and bolting. Three-line CMS F1 system. F1 hybrid onion seed."],
+                "Ceylon Hybrid Onion": ["2.5-3 kg/acre.", "Premium uniform dark-red bulbs with strong skin retention, high yield and good storability.", "Good purple-blotch and Stemphylium tolerance. CMS inbred-line F1 hybridization. F1 hybrid red onion."],
+                "Onion Improved (Roja)": ["3.5-4 kg/acre.", "Bright-red round-flat bulbs with good uniformity, crisp pungent rings and reliable Rabi/late-Kharif yield.", "Tolerant to bolting and common leaf blights. Recurrent bulb-to-seed mass selection. Improved OP onion."],
+                "Brinjal Garlic": ["150-200 kg cloves/acre if garlic; 3-4 kg/acre if onion/shallot seed.", "Pungent aromatic bulbs/cloves for organic kitchen gardening and local fresh markets.", "Hardy adaptation to soil-borne fungal stress. Clonal/landrace selection. Organic OP or clonal planting stock."],
+                "HIMSONA": ["40-50 gm/acre; approximately 10,000-12,000 seeds.", "Semi-determinate vigorous plants; deep-red oval-round firm fruits 90-100 gm with thick skin for transport.", "High tolerance to Tomato Leaf Curl Virus and bacterial wilt. Hand-pollinated inbred F1 crossing. F1 hybrid tomato."],
+                "Chilli Kaali": ["80-100 gm/acre.", "Bushy high-branching plants; glossy blackish-dark-green 8-10 cm fruits with high pungency.", "Good ChiLCV and thrips/mites tolerance. Controlled inbred-line F1 hybridization. F1 hybrid dark-green chilli."],
+                "SEEDLESS": ["250-350 gm/acre.", "Dark-green smooth crunchy seedless fruits 16-18 cm with no bitterness; first harvest 38-42 days.", "Tolerant to downy mildew, powdery mildew and Cucumber Mosaic Virus. Gynoecious parthenocarpic F1. F1 seedless cucumber."],
+                "USM RANI": ["400-500 gm/acre.", "Vigorous open-field hybrid; uniform green cylindrical 18-20 cm fruits with crisp non-bitter flesh; picking begins 42-45 days.", "Good downy-mildew and heat tolerance. Gynoecious x monoecious F1 hybridization. F1 open-field cucumber."],
+                "BSS-816": ["2.5-3 kg/acre.", "Medium-tall plants with short internodes and tender 5-ridged dark-green pods 12-14 cm; picking begins 45-48 days.", "High resistance to YVMV and OELCV. Hand-pollinated inbred-line F1 hybridization. F1 bhindi/okra."],
+                "GOLDEN 385": ["120-150 gm/acre.", "Compact dome-shaped snow-white curds 1.0-1.2 kg covered by jacket leaves; ready 65-70 days after transplanting.", "Tolerant to black rot and downy mildew. Self-incompatibility/CMS F1 hybridization. F1 hybrid cauliflower."],
+                "SAKI": ["100-120 gm/acre; approximately 14,000-16,000 seeds.", "Japanese premium hybrid with tight fine-beaded bluish-green dome heads 400-500 gm and no hollow stem; 60-65 days.", "Tolerant to downy mildew, black rot and head brown-bead. Japanese CMS F1 breeding. F1 hybrid broccoli."],
+                "ivory white": ["3-4 kg/acre.", "Long 25-30 cm straight smooth milky-white roots that remain crisp and pith-free; ready 40-45 days.", "Tolerant to white rust, Alternaria spot and early bolting. Self-incompatibility F1 breeding. F1 white radish."],
+                "Hybrid Radish Snow White": ["3-4 kg/acre.", "Pure snow-white cylindrical tender roots with mild pungency and crisp texture; harvest in 40-45 days.", "Tolerant to pithiness and heat stress. Controlled F1 hybrid crossing. F1 hybrid radish."],
+                "Imported Turnip Rose (Shalgam)": ["1.5-2 kg/acre.", "Purple-rose top with pure-white lower root; smooth round globe, sweet tender flesh; ready 45-50 days.", "Good cold tolerance and resistance to root cracking. Root-to-seed mass selection. OP imported turnip."],
+                "Fast Grow (Coriander)": ["8-10 kg/acre.", "Rapid sprouting with lush dark-green broad aromatic leaves; slow bolting allows 2-3 leafy cuttings.", "Tolerant to powdery mildew, stem gall and heat bolting. Recurrent leaf-yield selection. Improved multi-cut OP coriander."],
+                "Coriander Vijetha (cut )": ["8-10 kg/acre.", "Selected for repeated cutting; fast regrowth, thick aromatic stems/leaves; first cut 30-35 days.", "Good leaf-spot and premature-flowering tolerance. Progeny selection. Improved OP leaf coriander."],
+                "Coriander": ["8-10 kg/acre.", "Fragrant green foliage with good germination; suited to year-round kitchen and small-bed sowing.", "Moderate tolerance to common leaf blights. Mass selection. OP coriander."],
+                "Methi (Fenugreek)": ["10-12 kg/acre.", "Quick-germinating broad tender green leaves with rich aroma and mild bitterness; first harvest 25-30 days.", "Tolerant to downy mildew and root rot in well-drained beds. Pure-line selection. Improved OP fenugreek."],
+                "Palak Komal": ["10-12 kg/acre.", "Smooth broad dark-green succulent leaves with tender stalks; quick regrowth gives 4-6 cuttings.", "Tolerant to Cercospora leaf spot and warm-weather bolting. Mass and isolation breeding. OP multi-cut palak."],
+                "Corn Kanchanmoti": ["7-8 kg/acre grain; 15-18 kg/acre green fodder.", "Strong lodging-resistant stalks and long cylindrical cobs with bold shiny golden-orange grains; matures 95-105 days.", "Tolerant to Turcicum leaf blight, stalk rot and heat stress. Single-cross inbred hybridization. Hybrid field maize."],
+                "Corn-Maize Kanchan Moti": ["7-8 kg/acre grain; 15-18 kg/acre green fodder.", "Strong lodging-resistant stalks and long cylindrical cobs with bold shiny golden-orange grains; matures 95-105 days.", "Tolerant to Turcicum leaf blight, stalk rot and heat stress. Single-cross inbred hybridization. Hybrid field maize."],
+                "Discovery": ["7-8 kg/acre.", "High-vigor plants with stay-green leaves, heavy grain and wide adaptation across Kharif and Rabi.", "Good leaf-blight and charcoal-stalk-rot tolerance. Controlled hybrid/composite breeding. Research hybrid/improved seed."],
+                "Rajmah S-27": ["30-35 kg/acre.", "Compact early-maturing bush pulse 75-85 days; bold attractive red-variegated kidney seeds with good cooking quality.", "Tolerant to BCMV and root rot. Pure-line selection. Improved OP pulse seed."],
+                "Hybrid Surgum Knnar SSG Red": ["10-12 kg/acre for green fodder.", "Multi-cut Sudan-grass x sorghum hybrid; fast regrowth gives 4-5 cuts with sweet juicy stems and high leaf-to-stem ratio.", "Strong drought/heat tolerance and leaf-blight resistance. CMS interspecific hybridization. F1 multi-cut fodder sorghum."]
+            };
+
+            const seedBreedingGuide = {
+                "AFA-15 (Peas)": "Pedigree and pure-line selection: the best single parent plant was chosen and its next-generation seeds were grown over seasons until every plant grew uniformly.",
+                "IMPROVED PEAS MAXIMA 3636 (Peas)": "Single-plant progeny and pedigree selection: the next-generation seed lines of one superior plant were tracked so the double-pod trait remains consistent.",
+                "NRL -8080 Plus (Peas)": "Pure-line selection: one pure, self-pollinated plant line was multiplied so all seeds ripen at the same time.",
+                "GS 10 (Peas)": "Controlled cross-breeding and pedigree selection: two strong pea varieties were crossed, then the best next-generation seed lines were selected over several seasons.",
+                "AFA-10 (Peas)": "Pedigree selection and line purification: off-type plants were removed over several seed generations to keep the seed stock pure.",
+                "Mucio (Peas)": "Targeted trait crossing and pedigree selection: disease-resistant parent plants were crossed and only seed lines carrying wilt resistance were retained.",
+                "Peas Seeds GW-10": "Mass and pure-line selection: seeds were saved from the healthiest cold-hardy plants, then the best single line was purified.",
+                "Bean Rainbow (bush Beans)": "Pure-line selection: seeds were selected from one true bush plant that self-pollinated, so every seed grows compactly without trailing vines.",
+                "Moraleda": "Pedigree and disease-marker selection: plant traits and next-generation seed lines were tested to lock in virus resistance and stringless pods.",
+                "Pole Beans Belli": "Pedigree selection: the longest-bearing climbing plant was chosen and its pure next-generation seed line was maintained over seasons.",
+                "Pole Beans Rani": "Pure-line selection: seeds from one true-to-type climbing plant were multiplied so pods remain tender and uniform.",
+                "Pole Bean Madhubala": "Controlled crossing and progeny selection: two top pole beans were crossed and the highest-yielding next-generation seed line was selected.",
+                "Rosebella": "CMS hybridization: a naturally male-sterile mother onion was crossed with a selected father onion so the seeds produce true hybrids.",
+                "Red creole": "Recurrent bulb-to-seed selection: the hardest, best-storing bulbs were replanted each year and their seed was collected.",
+                "Stark Ayres": "Recurrent bulb-to-seed selection: the hardest, best-storing bulbs were replanted each year and their seed was collected.",
+                "Onion Red Creole": "Recurrent bulb selection: firm, tight-necked bulbs were selected over several cycles to prevent sprouting or rotting in storage.",
+                "F-1 Hybrid (Rosabella Onion )": "CMS-based F1 hybrid breeding: two inbred onion lines were crossed through male sterility so bulbs grow with the same shape and size.",
+                "Onion N-53 (Dark Red ) Naasik": "Mass selection: seeds were pooled from many healthy, early-bulking dark-red Nashik bulbs grown in rainy conditions.",
+                "Hybrid Onion T 821": "Three-line CMS F1 hybrid system: pure Japanese parent lines were crossed for single-center bulbs and minimal double-bulbs.",
+                "Ceylon Hybrid Onion": "CMS-based inbred-line F1 hybridization: purified parent lines were crossed for uniform bulb size and high yield.",
+                "Onion Improved (Roja)": "Recurrent bulb-to-seed mass selection: uniform, non-bolting bulbs were selected every season to produce pure seed.",
+                "Brinjal Garlic": "Clonal/landrace selection: bulbs or seeds were repeatedly multiplied from hardy traditional plants adapted to local soil.",
+                "HIMSONA": "Hand-pollinated inbred F1 crossing: a virus-resistant mother plant was crossed with a firm-fruited father plant by hand.",
+                "Chilli Kaali": "Controlled inbred-line F1 hybridization: two pure parent chilli lines were crossed to combine dark-green color and heavy branching.",
+                "SEEDLESS": "Gynoecious parthenocarpic F1 breeding: an all-female flowering hybrid sets seedless fruit automatically without bees.",
+                "USM RANI": "Gynoecious x monoecious F1 hybridization: a heavy-fruiting female line was crossed with a heat-hardy male line.",
+                "BSS-816": "Hand-pollinated inbred-line F1 hybridization: two pure bhindi parents were crossed to add YVMV resistance and close fruit nodes.",
+                "GOLDEN 385": "Self-incompatibility/CMS F1 hybridization: self-pollination was prevented so two pure parent lines formed tight white curds.",
+                "SAKI": "Japanese CMS F1 hybrid breeding: male-sterile mother plants produced uniform, solid-stemmed dome heads.",
+                "ivory white": "Self-incompatibility F1 breeding: two distinct radish lines were crossed so roots grow straight, smooth and sponge-free.",
+                "Hybrid Radish Snow White": "Controlled F1 hybrid crossing: selected inbred radish lines were crossed for tender flesh and uniform root length.",
+                "Imported Turnip Rose (Shalgam)": "Root-to-seed mass selection: only smooth, round, crack-free turnip roots were replanted to harvest pure seed.",
+                "Fast Grow (Coriander)": "Recurrent leaf-yield selection: seeds were saved only from late-flowering, broad-leaved plants over several cycles.",
+                "Coriander Vijetha (cut )": "Progeny selection: next-generation seed rows were tested after cutting and only fast-regrowing plants were retained.",
+                "Coriander": "Mass selection: seed was harvested together from many healthy, aromatic plants in a pure field.",
+                "Methi (Fenugreek)": "Pure-line selection: one self-pollinated leafy methi plant was used so all seeds sprout and mature evenly.",
+                "Palak Komal": "Mass selection and isolation breeding: broad-leaved plants were grown away from wild beets so seed stayed pure.",
+                "Corn Kanchanmoti": "Single-cross inbred hybridization: two pure inbred maize lines were crossed to create hybrid vigor for big cobs and strong stalks.",
+                "Corn-Maize Kanchan Moti": "Single-cross inbred hybridization: two pure inbred maize lines were crossed to create hybrid vigor for big cobs and strong stalks.",
+                "Discovery": "Controlled hybrid/composite breeding: superior parent lines were combined so the crop performs across different soils.",
+                "Rajmah S-27": "Pure-line selection: one early-maturing bush plant was selected so all pods ripen together for easy harvesting.",
+                "Hybrid Surgum Knnar SSG Red": "CMS interspecific hybridization: grain sorghum was crossed with fast-regrowing Sudan grass to produce 4-5 fodder cuts."
+            };
+
+            const seedResistanceGuide = {
+                "AFA-15 (Peas)": "Tolerant to powdery mildew and early wilt.",
+                "IMPROVED PEAS MAXIMA 3636 (Peas)": "Good field tolerance to powdery mildew and Fusarium wilt.",
+                "NRL -8080 Plus (Peas)": "Tolerant to powdery mildew and root rot under normal drainage.",
+                "GS 10 (Peas)": "Strong tolerance to powdery mildew and rust.",
+                "AFA-10 (Peas)": "Tolerant to powdery mildew and Fusarium wilt.",
+                "Mucio (Peas)": "Resistant/tolerant to powdery mildew and Fusarium wilt Race 1.",
+                "Peas Seeds GW-10": "Moderate field tolerance to powdery mildew and cold stress.",
+                "Bean Rainbow (bush Beans)": "Tolerant to Bean Common Mosaic Virus (BCMV) and rust.",
+                "Moraleda": "High resistance to Bean Common Mosaic Virus (BCMV) and anthracnose.",
+                "Pole Beans Belli": "Tolerant to rust, angular leaf spot and mosaic virus.",
+                "Pole Beans Rani": "Moderate tolerance to rust and leaf spot diseases.",
+                "Pole Bean Madhubala": "Good field tolerance to Bean Common Mosaic Virus and rust.",
+                "Rosebella": "Tolerant to purple blotch and basal rot; low premature bolting.",
+                "Red creole": "Tolerant to pink root, purple blotch and storage rot.",
+                "Stark Ayres": "Tolerant to pink root, purple blotch and storage rot.",
+                "Onion Red Creole": "Strong tolerance to pink root and post-harvest storage decay.",
+                "F-1 Hybrid (Rosabella Onion )": "Tolerant to purple blotch, Stemphylium blight and bolting.",
+                "Onion N-53 (Dark Red ) Naasik": "Adapted to monsoon humidity; moderate tolerance to purple blotch.",
+                "Hybrid Onion T 821": "High tolerance to pink root, Fusarium basal rot and bolting.",
+                "Ceylon Hybrid Onion": "Good field tolerance to purple blotch and Stemphylium leaf blight.",
+                "Onion Improved (Roja)": "Tolerant to premature bolting and common leaf blights.",
+                "Brinjal Garlic": "Hardy local adaptation to soil-borne fungal stress.",
+                "HIMSONA": "High tolerance to Tomato Leaf Curl Virus (ToLCV) and bacterial wilt.",
+                "Chilli Kaali": "Good field tolerance to Chilli Leaf Curl Virus (ChiLCV) and thrips/mites.",
+                "SEEDLESS": "Tolerant to downy mildew, powdery mildew and Cucumber Mosaic Virus.",
+                "USM RANI": "Good tolerance to downy mildew and heat stress.",
+                "BSS-816": "High resistance to Yellow Vein Mosaic Virus (YVMV) and Okra Enation Leaf Curl Virus (OELCV).",
+                "GOLDEN 385": "Tolerant to black rot (Xanthomonas) and downy mildew.",
+                "SAKI": "Tolerant to downy mildew, black rot and head brown-bead.",
+                "ivory white": "Tolerant to white rust, Alternaria leaf spot and early bolting.",
+                "Hybrid Radish Snow White": "Tolerant to pithiness and heat stress.",
+                "Imported Turnip Rose (Shalgam)": "Good cold tolerance and resistance to root cracking.",
+                "Fast Grow (Coriander)": "Tolerant to powdery mildew, stem gall and heat bolting.",
+                "Coriander Vijetha (cut )": "Good tolerance to leaf spot and premature flowering.",
+                "Coriander": "Moderate tolerance to common leaf blights.",
+                "Methi (Fenugreek)": "Tolerant to downy mildew and root rot in well-drained beds.",
+                "Palak Komal": "Tolerant to Cercospora leaf spot and slow to bolt in warm weather.",
+                "Corn Kanchanmoti": "Tolerant to Turcicum leaf blight, stalk rot and heat stress.",
+                "Corn-Maize Kanchan Moti": "Tolerant to Turcicum leaf blight, stalk rot and heat stress.",
+                "Discovery": "Good tolerance to leaf blight and charcoal stalk rot.",
+                "Rajmah S-27": "Tolerant to Bean Common Mosaic Virus and root rot.",
+                "Hybrid Surgum Knnar SSG Red": "Strong drought/heat tolerance and leaf-blight resistance."
+            };
+
+            const seedTypeGuide = {
+                "AFA-15 (Peas)": "Improved Open-Pollinated (OP) vegetable pea",
+                "IMPROVED PEAS MAXIMA 3636 (Peas)": "Research improved pea variety",
+                "NRL -8080 Plus (Peas)": "Improved Open-Pollinated (OP) pea",
+                "GS 10 (Peas)": "Improved research garden pea",
+                "AFA-10 (Peas)": "Improved Open-Pollinated (OP) pea",
+                "Mucio (Peas)": "Improved research garden pea",
+                "Peas Seeds GW-10": "Open-Pollinated (OP) pea variety",
+                "Bean Rainbow (bush Beans)": "Improved bush French bean (OP)",
+                "Moraleda": "Premium research bush French bean",
+                "Pole Beans Belli": "Improved pole (climbing) French bean",
+                "Pole Beans Rani": "Open-Pollinated (OP) pole bean",
+                "Pole Bean Madhubala": "Research improved pole bean",
+                "Rosebella": "F1 hybrid red onion",
+                "Red creole": "Short-day Open-Pollinated (OP) storage onion",
+                "Stark Ayres": "Short-day Open-Pollinated (OP) storage onion",
+                "Onion Red Creole": "Short-day Open-Pollinated (OP) onion",
+                "F-1 Hybrid (Rosabella Onion )": "F1 hybrid onion seed",
+                "Onion N-53 (Dark Red ) Naasik": "Open-Pollinated (OP) Kharif red onion",
+                "Hybrid Onion T 821": "F1 hybrid onion seed",
+                "Ceylon Hybrid Onion": "F1 hybrid red onion",
+                "Onion Improved (Roja)": "Improved Open-Pollinated (OP) onion",
+                "Brinjal Garlic": "Organic OP/clonal planting stock",
+                "HIMSONA": "F1 hybrid tomato seed",
+                "Chilli Kaali": "F1 hybrid dark-green chilli",
+                "SEEDLESS": "F1 parthenocarpic (seedless) cucumber",
+                "USM RANI": "F1 hybrid open-field cucumber",
+                "BSS-816": "F1 hybrid bhindi/okra seed",
+                "GOLDEN 385": "F1 hybrid cauliflower seed",
+                "SAKI": "F1 hybrid broccoli seed",
+                "ivory white": "F1 hybrid white radish (mooli)",
+                "Hybrid Radish Snow White": "F1 hybrid radish seed",
+                "Imported Turnip Rose (Shalgam)": "Open-Pollinated (OP) imported turnip",
+                "Fast Grow (Coriander)": "Improved multi-cut Open-Pollinated coriander",
+                "Coriander Vijetha (cut )": "Improved Open-Pollinated (OP) leaf coriander",
+                "Coriander": "Open-Pollinated (OP) coriander",
+                "Methi (Fenugreek)": "Improved Open-Pollinated (OP) fenugreek",
+                "Palak Komal": "Open-Pollinated (OP) multi-cut palak",
+                "Corn Kanchanmoti": "Hybrid field corn/maize",
+                "Corn-Maize Kanchan Moti": "Hybrid field corn/maize",
+                "Discovery": "Research hybrid/improved seed",
+                "Rajmah S-27": "Improved Open-Pollinated (OP) pulse seed",
+                "Hybrid Surgum Knnar SSG Red": "F1 multi-cut fodder sorghum hybrid"
+            };
+
+            const machineryDetails = {
+                "Balwaan Battery Sprayer BS-22D": ["12V 12Ah lead-acid battery, dual motor, 160 PSI.", "20 litre tank; up to 15-20 tanks per charge.", "Flush pump with clean water after chemicals."],
+                "Balwaan Gold Series Sprayer BS-30G": ["Heavy-duty 12V lead-acid battery, 130 PSI.", "20 litre tank.", "Flush after use and store battery safely."],
+                "Balwaan Gold Series Li-Ion BS-30GL": ["12V removable lithium-ion battery.", "20 litre tank; 4h dual-motor operation.", "Use charger and battery safety instructions."],
+                "Balwaan Side Pack Brush Cutter BX-35": ["35cc 4-stroke petrol engine, 1.5 HP.", "Pure petrol, no 2T mix.", "Use harness and face/eye protection."],
+                "Earth Auger BE-52": ["52cc 2-stroke petrol, 2.3 HP.", "8-inch plantation/post holes.", "Fuel petrol + 2T oil at 25:1."],
+                "Earth Auger BE-63": ["63cc petrol earth auger.", "Handheld drilling machine.", "Use protective clothing and stabilize before drilling."],
+                "Earth Auger BE-63T": ["63cc trolley-mounted earth auger.", "Improved stability for drilling.", "Use petrol + 2T oil as specified."],
+                "Power Weeder BW-25": ["63cc 3 HP petrol engine.", "16-inch working width.", "Suitable for narrow inter-row work."],
+                "Power Weeder BP-650": ["212cc 7 HP petrol engine.", "3ft working width.", "Heavy orchard tillage."],
+                "Power Weeder BP-700": ["212cc 7 HP petrol engine.", "Heavy-duty multi-task PTO system.", "Use trained operator and shields."],
+                "50 GE Power Weeder": ["VST model 50 GE, 5.4 HP petrol.", "Model number is not horsepower.", "Use normal power-implement precautions."],
+                "55 GE Power Weeder": ["VST model 55 GE, 5.4 HP petrol.", "Model number is not horsepower.", "Use normal power-implement precautions."],
+                "35 GE Power Weeder": ["VST model 35 GE, 3.5 HP petrol.", "Model number is not horsepower.", "Use normal power-implement precautions."],
+                "Soilometer Advance Kit": ["Portable on-farm colorimetric soil test kit.", "Tests pH, organic carbon, N, P, K and microbial activity.", "Reagent shelf life 12-24 months."]
+            };
+
+            const machineryGuide = {
+                "A4 Yellow Double-Side Trap": ["Passive adhesive attraction; no power or fuel.", "A4, double-sided, 12-piece pack.", "Attracts whiteflies, winged aphids, fungus gnats and leafminers.", "Hang at crop-canopy level for monitoring and light trapping.", "Replace weekly or when about 70 percent of the card is covered."],
+                "A4 Blue Double-Side Trap": ["Passive adhesive attraction; no power or fuel.", "A4, double-sided, 12-piece pack.", "Targets thrips in polyhouses and flower beds.", "Hang at canopy level and record pest counts.", "Replace every 7-14 days."],
+                "A4 Yellow Butter Paper Trap": ["Passive adhesive attraction; no power or fuel.", "A4 size, 50-piece bulk pack.", "Commercial acreage and greenhouse pest monitoring.", "Use as a bulk monitoring and population-suppression card pack.", "Replace when saturated with insects or dust."],
+                "A4 Blue Sticky Trap": ["Passive adhesive attraction; no power or fuel.", "A4 size, 50-piece bulk pack.", "Blue cards are suited to thrips monitoring.", "Place throughout protected or open crops at canopy height.", "Replace regularly and compare trap counts."],
+                "A4 White Butter Paper Sheet": ["Passive monitoring surface; no power or fuel.", "A4 white butter-paper sheet, 50-piece pack.", "Target-specific pest scouting protocols.", "Follow the pest-monitoring plan for crop and color target.", "Replace when dirty or saturated."],
+                "A5 yellow sticky trap pack of 25": ["Passive yellow adhesive attraction; no power or fuel.", "A5 size, 25 cards.", "Nursery and small-plot pest monitoring.", "Compact cards are easy to place in small crop plots.", "Replace when insect coverage or dust reduces adhesion."],
+                "A5 blue sticky trap pack of 25": ["Passive blue adhesive attraction; no power or fuel.", "A5 size, 25 cards.", "Thrips monitoring in nurseries and flower beds.", "Place at canopy level.", "Replace every 7-14 days."],
+                "A5 yellow sticky trap pack of 10": ["Passive yellow adhesive attraction; no power or fuel.", "A5 size, 10 cards.", "Small-farm trials and nursery plots.", "Use for initial pest monitoring.", "Replace weekly or when saturated."],
+                "A5 blue sticky trap pack of 10": ["Passive blue adhesive attraction; no power or fuel.", "A5 size, 10 cards.", "Small-farm thrips monitoring.", "Place near flowers and crop canopy.", "Replace every 7-14 days."],
+                "Lapeta Pipe 60m (63mm)": ["No engine or motor; flexible lay-flat water delivery.", "60 metres, 63 mm (about 2.5 inch).", "Connects a pump outlet to field channels or irrigation lines.", "Unroll fully for discharge and low-pressure loss.", "Drain and dry before rolling; keep away from sun damage."],
+                "Lapeta Pipe 60m (75mm)": ["No engine or motor; high-flow lay-flat delivery.", "60 metres, 75 mm (about 3 inch).", "Field irrigation and high-flow water transfer.", "Suitable for direct pump discharge.", "Dry before storage and roll without sharp bends."],
+                "Lapeta Pipe 60m (90mm)": ["No engine or motor; high-flow lay-flat delivery.", "60 metres, 90 mm (about 3.5 inch).", "Large-volume irrigation delivery.", "Use a suitable pump and secure pipe ends.", "Avoid dragging over sharp stones; dry before rolling."],
+                "Balwaan Battery Sprayer BS-22D": ["12V 12Ah lead-acid battery, dual motor, 160 PSI.", "20 litre tank.", "Uniform spray for orchards, vegetables and field crops.", "Sprays approximately 15-20 tanks per charge.", "Flush with clean water after chemical use; charge and store battery safely."],
+                "Balwaan Gold Series Sprayer BS-30G": ["Heavy-duty 12V lead-acid battery, dual pressure controls, 130 PSI.", "20 litre tank.", "Battery spraying for crops and orchards.", "Heavy-duty operation with controlled pressure.", "Clean pump and tank after use; keep battery dry."],
+                "Balwaan Gold Series Li-Ion BS-30GL": ["Removable 12V lithium-ion battery.", "20 litre tank; 5.56 kg battery; 4 hours dual-motor operation.", "Hill and orchard spraying with lighter battery handling.", "Dual-motor continuous spray operation.", "Use the specified charger and never drain or short the battery."],
+                "Balwaan Side Pack Brush Cutter BX-35": ["35 cc, 4-stroke petrol engine, 1.5 HP.", "Side-pack cutting machine.", "Clears weeds, grass and field borders.", "Use petrol only; no 2T oil in fuel.", "Wear harness, face shield and eye protection; inspect blade guard."],
+                "Earth Auger BE-52": ["52 cc 2-stroke petrol engine, 2.3 HP.", "Portable auger for 8-inch plantation/post holes.", "Digging holes for plants, fence posts and stakes.", "Use a stable stance and start at low torque.", "Fuel uses petrol + 2T oil at 25:1; wear eye and hand protection."],
+                "Earth Auger BE-63": ["63 cc petrol engine.", "Handheld earth auger.", "Digging plantation and post holes.", "Suitable for earth drilling with correct bit size.", "Use protective clothing and a stable operating position."],
+                "Earth Auger BE-63T": ["63 cc petrol engine, trolley-mounted.", "Trolley-mounted earth auger.", "Heavy or repeated plantation/post-hole digging.", "Trolley improves stability and handling.", "Use specified petrol/2T mixture and keep the auger guarded."],
+                "Electric Motor Pump 0.5 HP Aluminium": ["KOEL 0.5 HP motor with aluminium winding.", "0.5 HP electric motor pump.", "Small irrigation and water transfer.", "Suitable for low to medium lift where power supply is available.", "Verify earthing and install by an electrician."],
+                "Electric Motor Pump 0.5 HP Copper": ["KOEL 0.5 HP motor with copper winding.", "0.5 HP electric motor pump.", "Small irrigation and water transfer.", "Copper winding gives a durable motor option.", "Verify earthing, voltage and cable protection."],
+                "Electric Motor Pump 1 HP Aluminium": ["KOEL 1 HP motor with aluminium winding.", "1 HP electric motor pump.", "Higher-flow irrigation and water transfer.", "Suitable for farm supply and field channel filling.", "Verify earthing and protect against dry running."],
+                "Electric Motor Pump 1 HP Copper": ["KOEL 1 HP motor with copper winding.", "1 HP electric motor pump.", "Higher-flow irrigation and water transfer.", "Copper winding is a durable motor option.", "Verify earthing and prevent dry running."],
+                "Power Weeder BW-25": ["63 cc, 3 HP petrol engine.", "Mini tiller; 16-inch working width.", "Inter-row weed removal in narrow rows.", "Compact hill and small-field operation.", "Wear boots and eye protection; keep hands away from rotating tools."],
+                "Power Weeder BP-650": ["212 cc, 7 HP petrol engine.", "Heavy tiller; about 3 ft working width.", "Tilling open orchard and field areas.", "High-power open-area weeding.", "Use trained operation and full guards; stop before clearing clogs."],
+                "Power Weeder BP-700": ["212 cc, 7 HP petrol engine.", "Heavy-duty multi-task PTO-drive weeder.", "Orchard tilling and heavy farm work.", "Suitable for multiple implements and demanding field use.", "Use PTO guards and trained operation."],
+                "50 GE Power Weeder": ["VST 50 GE, 5.4 HP petrol.", "Model 50 GE; model number is not horsepower.", "Power weeding and light field tillage.", "50 and 55 models are both rated 5.4 HP.", "Use shields and trained operator controls."],
+                "55 GE Power Weeder": ["VST 55 GE, 5.4 HP petrol.", "Model 55 GE; model number is not horsepower.", "Power weeding and light field tillage.", "Higher model designation does not mean higher horsepower.", "Use shields and trained operator controls."],
+                "35 GE Power Weeder": ["VST 35 GE, 3.5 HP petrol.", "Model 35 GE; model number is not horsepower.", "Compact power weeding and tillage.", "Suitable for lighter farm work.", "Use shields and trained operator controls."],
+                "Soilometer Advance Kit": ["Portable passive colorimetric testing kit.", "Tests soil pH, organic carbon, N, P, K and microbial activity.", "On-farm soil-health measurement.", "Follow reagent and sample preparation instructions.", "Reagent shelf life is 12-24 months; store dry and sealed."],
+                "30*20 (800 Mtr)": ["Passive silver-black mulching film.", "30 inch width, 20 micron, 800 metre roll.", "Weed suppression and soil moisture control.", "Lay evenly over prepared raised beds.", "Secure edges and avoid tear points."],
+                "30*25 (800 Mtr)": ["Passive silver-black mulching film.", "30 inch width, 25 micron, 800 metre roll.", "Weed control and moisture retention.", "Best for longer roll applications.", "Anchor edges and avoid sharp tools."],
+                "30*30 (800 Mtr)": ["Passive silver-black mulching film.", "30 inch width, 30 micron, 800 metre roll.", "Heavy weed suppression and moisture retention.", "Lay over beds and punch planting points.", "Anchor tightly and protect from punctures."],
+                "39*20 (400 Mtr )": ["Passive silver-black mulching film.", "39 inch width, 20 micron, 400 metre roll.", "Wide-bed weed and moisture control.", "Lay flat over prepared soil.", "Secure edges and prevent sunlight tear."],
+                "39*25 (400 Mtr )": ["Passive silver-black mulching film.", "39 inch width, 25 micron, 400 metre roll.", "Wide-bed weed and moisture control.", "Suitable for medium-duty field use.", "Anchor along edges and avoid punctures."],
+                "39*30 (400 Mtr )": ["Passive silver-black mulching film.", "39 inch width, 30 micron, 400 metre roll.", "Wide-bed heavy weed suppression.", "Lay and secure before planting.", "Avoid dragging across stones."],
+                "48*20 (400 Mtr)": ["Passive silver-black mulching film.", "48 inch width, 20 micron, 400 metre roll.", "Very wide beds and moisture retention.", "Use a mulch applicator or two-person laying.", "Secure every edge and cover punctures."],
+                "48*25 (400 Mtr)": ["Passive silver-black mulching film.", "48 inch width, 25 micron, 400 metre roll.", "Wide-bed weed suppression.", "Lay over level, moist soil.", "Anchor firmly and protect from sharp tools."],
+                "48*30 (400 Mtr)": ["Passive silver-black mulching film.", "48 inch width, 30 micron, 400 metre roll.", "Heavy-duty wide-bed mulch.", "Suitable for longer-term protected beds.", "Avoid punctures and secure all edges."],
+                "Sutli": ["Passive tying and bundling cord.", "25 kg pack.", "Plant staking, bean/tomato trellising and crop bundling.", "Cut suitable lengths and tie firmly without damaging stems.", "Store dry and away from direct sun."],
+                "Agricultural Net 8*30": ["Passive netting; no power or fuel.", "8 x 30 size.", "Polyhouse shade, anti-hail protection or bird netting.", "Anchor tightly to frame supports.", "Inspect ties and repair tears regularly."],
+                "Agricultural Net 9*30": ["Passive netting; no power or fuel.", "9 x 30 size.", "Polyhouse, orchard or bird protection.", "Anchor evenly to prevent sagging.", "Inspect and tighten supports after wind."],
+                "Agricultural Net 10*10": ["Passive netting; no power or fuel.", "10 x 10 size.", "Small protected plots and bird control.", "Fasten at all frame edges.", "Keep net clear of rotating equipment."],
+                "Agricultural Net 10*50": ["Passive netting; no power or fuel.", "10 x 50 size.", "Large area shade, hail or bird protection.", "Use adequate frame spacing and anchors.", "Check after storms and repair tears."],
+                "Agricultural Net 10*30": ["Passive netting; no power or fuel.", "10 x 30 size.", "Orchard, polyhouse or anti-hail protection.", "Anchor tightly to frame supports.", "Do not leave loose flaps exposed to wind."]
+            };
+
+            function normalizeCategory(raw) {
+                const s = raw.toUpperCase();
+                if (s === "SEED") return "Seed";
+                if (["FERTILIZER","NUTRITION","TONIC","TONIC PGR"].includes(s)) return "Nutrition";
+                if (["FUNGICIDE","INSECTISIDES","MITICIDES","HERBICIDES","ANTIBIOTIC","ANTIVIRUS","STICKERS"].includes(s)) return "Protection";
+                if (["MACHINERY","LAPETA PIPE","STICKY TRAPS","MULCHING SHEET","SUTLI","EQUIPMENT","NET"].includes(s)) return "Machinery";
+                return "Protection";
+            }
+
+            catalogText.split(/\n/).filter(Boolean).forEach((line, index) => {
+                const parts = line.trim().split("|");
+                if (parts.length < 6) return;
+                const row = Number(parts[0]);
+                const rawCategory = parts[1];
+                const company = parts[2];
+                const name = parts[3];
+                const pack = parts[4];
+                const price = Number(parts[5]);
+                const cat = normalizeCategory(rawCategory);
+                const chemical = chemicalDetails[name];
+                const seed = seedDetails[name];
+                const machine = machineryDetails[name];
+                const guide = chemical || seed || machine;
+                const farmerGuide = farmerChemicalGuide[name];
+                const fertilizerNutritionGuide = fertilizersAndNutrientsData.find(item => item.sr_no === row);
+                const seedGuide = rawCategory === "SEED" ? seedDetails[name] : null;
+                productsData.push({
+                    id: `p-live-${row}`,
+                    sku: `SKU-${String(row).padStart(3, '0')}`,
+                    sourceRow: row,
+                    name,
+                    company,
+                    cat,
+                    pack,
+                    price,
+                    tech: fertilizerNutritionGuide ? `${fertilizerNutritionGuide.product_classification} | Composition: ${fertilizerNutritionGuide.composition} | Manufacturing process: ${fertilizerNutritionGuide.manufacturing_process}` : (seedGuide ? "Seed variety" : (farmerGuide ? farmerGuide.chemical : (guide ? guide[0] : `${rawCategory} inventory item`))),
+                    dosage: fertilizerNutritionGuide ? fertilizerNutritionGuide.recommended_dosage : (seedGuide ? seedGuide[0] : (farmerGuide ? farmerGuide.dosage : (guide && guide.length > 1 ? guide[1] : "Use only the crop or equipment label instructions."))),
+                    targets: fertilizerNutritionGuide ? fertilizerNutritionGuide.agricultural_uses : (seedGuide ? seedGuide[0] : (farmerGuide ? `${farmerGuide.works} Problem solved: ${farmerGuide.problem}` : (rawCategory === "SEED" ? "Seed selection, sowing and crop establishment" : `${rawCategory} application`))),
+                    benefits: seedGuide ? seedGuide[1] : (farmerGuide ? farmerGuide.benefits : (guide ? guide[1] : (fertilizerNutritionGuide ? fertilizerNutritionGuide.agricultural_uses : "Listed in the verified Live Price list."))),
+                    precautions: fertilizerNutritionGuide ? fertilizerNutritionGuide.precautions_and_compatibility : (seedGuide ? seedGuide[2] : (farmerGuide ? `Precaution: ${farmerGuide.precautions} Special feature: ${farmerGuide.special}` : (guide && guide.length > 2 ? guide[2] : "Read the physical pack label and follow local safety instructions."))),
+                    seedResistance: rawCategory === "SEED" ? seedResistanceGuide[name] : null,
+                    seedBreeding: rawCategory === "SEED" ? seedBreedingGuide[name] : null,
+                    seedType: rawCategory === "SEED" ? seedTypeGuide[name] : null,
+                    machinePower: cat === "Machinery" && machineryGuide[name] ? machineryGuide[name][0] : null,
+                    machineSpecs: cat === "Machinery" && machineryGuide[name] ? machineryGuide[name][1] : null,
+                    machineUse: cat === "Machinery" && machineryGuide[name] ? machineryGuide[name][2] : null,
+                    machinePerformance: cat === "Machinery" && machineryGuide[name] ? machineryGuide[name][3] : null,
+                    machineCare: cat === "Machinery" && machineryGuide[name] ? machineryGuide[name][4] : null,
+                    aliases: []
+                });
+            });
+
+            // Preserve existing Crop Hub product references while linking them to verified live rows.
+            const aliases = {
+                "p-1":"HIMSONA","p-2":"Ceylon Hybrid Onion","p-3":"GS 10 (Peas)",
+                "p-4":"Mucio (Peas)","p-5":"GOLDEN 385","p-6":"USM RANI",
+                "p-7":"SAKI","p-8":"Pole Beans Belli","p-9":"SEEDLESS",
+                "p-10":"Corn-Maize Kanchan Moti","p-11":"Rajmah S-27","p-12":"Mucio (Peas)",
+                "p-13":"Chilli Kaali","p-14":"ANTRACOL","p-15":"SCORE","p-16":"RIDOMIL GOLD",
+                "p-17":"M-45","p-18":"KAVACH FLO","p-19":"Boon","p-21":"NETIVO",
+                "p-22":"BAVISTIN","p-23":"Chlorpyrifos 20% EC","p-24":"Actara",
+                "p-25":"Delegate","p-26":"AGRIVILLE BORON (DI-SODIUM OCTA BORATE TERAHYDRATE 20% BORON)",
+                "p-27":"Chelated Calcium","p-28":"00:00:50","p-31":"Yara Liva (Nitrabor)"
+            };
+            Object.entries(aliases).forEach(([alias, liveName]) => {
+                const exact = productsData.find(p => p.name === liveName);
+                if (exact) exact.aliases.push(alias);
+            });
+        }
+
+        generateDataset();
+
+        // -------------------------------------------------------------
+        // 15 CROPS ADVISORY DATABASE
+        // -------------------------------------------------------------
+        const cropsDatabase = {
+            apple: {
+                name: "APPLE (Apple Scab, Mites, Collar Rot, Pink Bud)",
+                stages: [
+                    { 
+                        id: "stg1", label: "Stage 1: Sowing / Nursery & Green Tip (Dormant)", month: "DECEMBER - MARCH", 
+                        growth: "Rootstock planting, scion grafting, and bud swell (1-2mm). Critical window for nursery stock selection.", temp: "5°C - 12°C",
+                        management: "Plant certified virus-free rootstocks. Perform dormant copper wash before spring bud swell.",
+                        seedItems: [
+                            { label: "Apple M9 Rootstock Sapling", solution: "p-5" }
+                        ],
+                        flow: []
+                    },
+                    { 
+                        id: "stg2", label: "Stage 2: Pink Bud / Pre-Bloom", month: "APRIL (Mid Hills)", 
+                        growth: "Cluster buds expand showing bright pink flowers. Rapid leaf emergence.", temp: "12°C - 18°C",
+                        management: "High moisture and early spring rains trigger primary scab ascospore discharge.",
+                        flow: [
+                            { problem: "Primary Apple Scab Ascospore Infection", solution: "p-14 text:Antracol 70% WP" },
+                            { problem: "Powdery Mildew on Young Shoots", solution: "p-15 text:Score 25% EC" },
+                            { problem: "Pink Bud Flower Drop & Poor Pollination Set", solution: "p-26 text:Agriville Boron 20%" }
+                        ]
+                    },
+                    { 
+                        id: "stg3", label: "Stage 3: Petal Fall & Fruit Setting", month: "APRIL - MAY", 
+                        growth: "Petals drop off and tiny green fruitlets form (pea size).", temp: "15°C - 22°C",
+                        management: "Avoid harsh chemical tank-mixing during active bloom to protect pollinators.",
+                        flow: [
+                            { problem: "Post-Bloom Scab & Alternaria Leaf Spot", solution: "p-17 text:Indofil M-45" },
+                            { problem: "Rosetting & Little Leaf Deficiency", solution: "p-27 text:Chelated Zinc EDTA 12%" }
+                        ]
+                    },
+                    { 
+                        id: "stg4", label: "Stage 4: Fruit Expansion & Monsoon", month: "JUNE - JULY", 
+                        growth: "Fruit grows rapidly. High humidity accelerates red spider mite outbreaks.", temp: "18°C - 28°C",
+                        management: "Maintain 10-14 day spray schedule. Apply sticker to prevent rain wash-off.",
+                        flow: [
+                            { problem: "European Red Mite & Spider Mite Outbreak", solution: "p-18 text:Oberon 22.9% SC" },
+                            { problem: "Mite Egg & Larval Nymph Resistance", solution: "p-19 text:Maiden 5.45% EC" },
+                            { problem: "Premature Leaf Fall (Marssonina Blight)", solution: "p-21 text:Nativo 75 WG" }
+                        ]
+                    },
+                    { 
+                        id: "stg5", label: "Stage 5: Pre-Harvest & Fruit Color", month: "AUGUST - SEPTEMBER", 
+                        growth: "Fruit reaches full size, firmness, and anthocyanin red color development.", temp: "15°C - 25°C",
+                        management: "Apply potassium spray to boost color, brix sweetness, and storage life.",
+                        flow: [
+                            { problem: "Poor Red Skin Color & Low Fruit Size", solution: "p-28 text:SOP 00:00:50" },
+                            { problem: "Bitter Pit Deficiency Spots in Stored Fruit", solution: "p-31 text:YaraLiva Nitrabor" }
+                        ]
+                    }
+                ]
+            },
+            tomato: {
+                name: "TOMATO (Himsona, Late Blight, Damping Off)",
+                stages: [
+                    { 
+                        id: "stg1", label: "Stage 1: Nursery Sowing & Seed Selection", month: "FEB - MARCH", 
+                        growth: "Seeds sown in pro-trays/raised nursery beds. Transplanted after 25 days.", temp: "18°C - 25°C",
+                        management: "Select certified blight-tolerant hybrid seed varieties.",
+                        seedItems: [
+                            { label: "Tomato Himsona Hybrid Seed", solution: "p-1" }
+                        ],
+                        flow: []
+                    },
+                    { 
+                        id: "stg2", label: "Stage 2: Vegetative Growth & Staking", month: "APRIL - MAY", 
+                        growth: "Vines expand rapidly and require trellis staking support.", temp: "20°C - 30°C",
+                        management: "Tie vines securely to keep foliage off damp soil.",
+                        flow: [
+                            { problem: "Nursery Damping-Off & Root Rot", solution: "p-22 text:Bavistin 50 WP" },
+                            { problem: "Whitefly Transmitting Leaf Curl Virus", solution: "p-24 text:Actara 25 WG" }
+                        ]
+                    },
+                    { 
+                        id: "stg3", label: "Stage 3: Flowering & Fruit Set", month: "MAY - JUNE", 
+                        growth: "Yellow flowers produce green tomato clusters.", temp: "22°C - 32°C",
+                        management: "Foliar application of calcium and boron to strengthen fruit rind.",
+                        flow: [
+                            { problem: "Fruit Borer Caterpillars Boring Holes", solution: "p-25 text:Delegate 11.7 SC" },
+                            { problem: "Blossom End Rot (Black Bottoms on Fruit)", solution: "p-31 text:YaraLiva Nitrabor" }
+                        ]
+                    },
+                    { 
+                        id: "stg4", label: "Stage 4: Continuous Harvest & Monsoon Blight", month: "JULY - AUGUST", 
+                        growth: "Heavy fruit picking during continuous monsoon rains.", temp: "20°C - 28°C",
+                        management: "Apply systemic curative fungicides immediately after rain breaks.",
+                        flow: [
+                            { problem: "Devastating Late Blight Fruit & Leaf Rot", solution: "p-16 text:Ridomil Gold" },
+                            { problem: "Secondary Early Blight & Hail Wounds", solution: "p-17 text:Indofil M-45" }
+                        ]
+                    }
+                ]
+            },
+            garlic: {
+                name: "GARLIC / ONION (Selection G-282, Thrips, Purple Blotch)",
+                stages: [
+                    { 
+                        id: "stg1", label: "Stage 1: Clove Sowing & Seed Selection", month: "OCTOBER - NOVEMBER", 
+                        growth: "Cloves planted in well-drained raised beds.", temp: "10°C - 20°C",
+                        management: "Select broad-clove disease-resistant seeds. Treat with carbendazim prior to planting.",
+                        seedItems: [
+                            { label: "Garlic Selection G-282 Seed", solution: "p-2" }
+                        ],
+                        flow: []
+                    },
+                    { 
+                        id: "stg2", label: "Stage 2: Active Leaf Growth", month: "JANUARY - MARCH", 
+                        growth: "Vegetative foliage expands before bulb initiation.", temp: "12°C - 22°C",
+                        management: "Monitor under-side of waxy leaves for hidden thrips.",
+                        flow: [
+                            { problem: "Clove Rot & Seedling Damping-Off", solution: "p-22 text:Bavistin 50 WP" },
+                            { problem: "Sucking Thrips Curling Green Leaves", solution: "p-24 text:Actara 25 WG" }
+                        ]
+                    },
+                    { 
+                        id: "stg3", label: "Stage 3: Bulb Expansion & Maturity", month: "MARCH - MAY", 
+                        growth: "Bulbs enlarge beneath the soil surface.", temp: "20°C - 30°C",
+                        management: "Stop nitrogen application; switch to high potassium.",
+                        flow: [
+                            { problem: "Purple Blotch & Stemphylium Leaf Blight", solution: "p-14 text:Antracol 70% WP" },
+                            { problem: "Small Bulb Size & Low Weight", solution: "p-28 text:SOP 00:00:50" }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // Populate remaining 12 crops programmatically to guarantee complete 15-crop feed
+        const otherCropsList = [
+            { key: "pea", name: "PEA (GS-10, Powdery Mildew, Pod Borer)", seedId: "p-3", seedName: "Pea Seed GS-10" },
+            { key: "potato", name: "POTATO (Kufri Jyoti, Seed Tuber Rot, Late Blight)", seedId: "p-4", seedName: "Potato Kufri Jyoti Certified Seed" },
+            { key: "capsicum", name: "CAPSICUM / SHIMLA MIRCH (Indra F1, Anthracnose)", seedId: "p-6", seedName: "Capsicum Indra F1 Seed" },
+            { key: "cauliflower", name: "CAULIFLOWER (Snow Myst, DBM, Clubroot)", seedId: "p-7", seedName: "Cauliflower Snow Myst Seed" },
+            { key: "cabbage", name: "CABBAGE (Golden Acre, Black Rot)", seedId: "p-8", seedName: "Cabbage Golden Acre Seed" },
+            { key: "cucumber", name: "CUCUMBER (Malini F1, Downy Mildew)", seedId: "p-9", seedName: "Cucumber Malini F1 Seed" },
+            { key: "cherry", name: "CHERRY (Temperate Orchard Spray Schedule)", seedId: "p-5", seedName: "Certified Cherry Grafted Sapling" },
+            { key: "plum", name: "PLUM / PEACH (Santa Rosa, Leaf Curl)", seedId: "p-5", seedName: "Santa Rosa Plum Grafted Plant" },
+            { key: "onion", name: "ONION (Rabi Red Bulb Production)", seedId: "p-2", seedName: "Certified Onion Seed Stock" },
+            { key: "maize", name: "MAIZE (Hill Field Corn, Fall Armyworm)", seedId: "p-10", seedName: "Maize Pioneer P-3396 Seed" },
+            { key: "wheat", name: "WHEAT (Rabi Grain, Yellow Rust)", seedId: "p-11", seedName: "Rajmah Chitra / Hill Wheat Seed" },
+            { key: "pomegranate", name: "POMEGRANATE (Bhagwa, Oily Spot)", seedId: "p-13", seedName: "Pomegranate Bhagwa Tissue Plant" }
+        ];
+
+        otherCropsList.forEach(c => {
+            cropsDatabase[c.key] = {
+                name: c.name,
+                stages: [
+                    { 
+                        id: "stg1", label: "Stage 1: Sowing / Nursery & Planting Phase", month: "MARCH - APRIL", 
+                        growth: "Seed germination and seedling establishment in field beds.", temp: "15°C - 24°C",
+                        management: "Select certified high-yield seeds or virus-free saplings.",
+                        seedItems: [{ label: c.seedName, solution: c.seedId }],
+                        flow: []
+                    },
+                    { 
+                        id: "stg2", label: "Stage 2: Vegetative Growth & Foliage", month: "MAY - JUNE", 
+                        growth: "Rapid vegetative foliage and shoot growth.", temp: "20°C - 30°C",
+                        management: "Apply balanced NPK foliar feeds and monitor for sucking insects.",
+                        flow: [
+                            { problem: "Soil Cutworms & Root Grubs", solution: "p-23 text:Chlorpyrifos 20% EC" },
+                            { problem: "Sucking Thrips, Whiteflies & Aphids", solution: "p-24 text:Actara 25 WG" }
+                        ]
+                    },
+                    { 
+                        id: "stg3", label: "Stage 3: Flowering & Pod/Fruit Set", month: "JULY - AUGUST", 
+                        growth: "Flower setting and fruit development.", temp: "18°C - 28°C",
+                        management: "Apply Boron to boost pollination and prevent flower drop.",
+                        flow: [
+                            { problem: "Flower Drop & Poor Pollination Set", solution: "p-26 text:Agriville Boron 20%" },
+                            { problem: "Fruit Borer & Caterpillar Damage", solution: "p-25 text:Delegate 11.7 SC" }
+                        ]
+                    },
+                    { 
+                        id: "stg4", label: "Stage 4: Fruit Expansion & Harvest", month: "AUGUST - SEPTEMBER", 
+                        growth: "Fruit reaching maturity and size expansion.", temp: "16°C - 26°C",
+                        management: "Apply high potassium SOP for firmness and color.",
+                        flow: [
+                            { problem: "Late Season Fungal Blight & Spot", solution: "p-17 text:Indofil M-45" },
+                            { problem: "Poor Fruit Color & Small Size", solution: "p-28 text:SOP 00:00:50" }
+                        ]
+                    }
+                ]
+            };
+        });
+
+        // -------------------------------------------------------------
+        // APPLICATION CONTROLLERS & UI RENDERERS
+        // -------------------------------------------------------------
+        let currentCategory = 'all';
+
+        function switchTab(tabName) {
+            ['catalog', 'advisory', 'calculator'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (el && btn) {
+                    el.classList.add('hidden');
+                    btn.className = "px-4 py-2.5 rounded-lg hover:bg-white/10 text-emerald-100 font-bold transition flex items-center gap-2";
+                }
+            });
+
+            const activeTab = document.getElementById(`tab-${tabName}`);
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            if (activeTab && activeBtn) {
+                activeTab.classList.remove('hidden');
+                activeBtn.className = "px-4 py-2.5 rounded-xl bg-white/20 text-white font-black transition flex items-center gap-2 shadow-sm border border-white/10";
+            }
+
+            if (tabName === 'advisory') {
+                renderDatabaseCropAdvisory();
+            } else if (tabName === 'calculator') {
+                calculateDosage();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderCatalogCards(items) {
+            const container = document.getElementById('catalog-cards-container');
+            const countBadge = document.getElementById('results-count');
+            container.innerHTML = '';
+
+            countBadge.innerText = `Showing ${items.length} Items`;
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center bg-white rounded-3xl border border-gray-200 space-y-3">
+                        <i class="fa-solid fa-triangle-exclamation text-3xl text-amber-500"></i>
+                        <h4 class="font-extrabold text-gray-800 text-lg">No matching agricultural products found</h4>
+                        <p class="text-xs text-gray-500">Try searching for a different chemical formulation, brand name, or targeted disease.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            items.forEach(prod => {
+                let badgeColor = "bg-emerald-100 text-emerald-800 border-emerald-300";
+                let iconClass = "fa-flask-vial";
+                if (prod.cat === 'Seed') { badgeColor = "bg-amber-100 text-amber-800 border-amber-300"; iconClass = "fa-seedling"; }
+                else if (prod.cat === 'Nutrition') { badgeColor = "bg-blue-100 text-blue-800 border-blue-300"; iconClass = "fa-vial"; }
+                else if (prod.cat === 'Machinery') { badgeColor = "bg-purple-100 text-purple-800 border-purple-300"; iconClass = "fa-tractor"; }
+
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-3xl p-5 border border-gray-200 hover:border-emerald-500 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-4 group";
+                card.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start gap-2">
+                            <span class="text-[10px] font-black uppercase px-3 py-1 rounded-full border ${badgeColor} flex items-center gap-1.5">
+                                <i class="fa-solid ${iconClass}"></i> ${prod.cat}
+                            </span>
+                            <span class="text-xs font-mono font-black text-gray-500 bg-gray-100 px-2.5 py-1 rounded-lg">${prod.sku}</span>
+                        </div>
+
+                        <div>
+                            <h4 class="text-lg font-black text-gray-900 group-hover:text-fpoGreen transition leading-snug">${prod.name}</h4>
+                            <p class="text-xs text-gray-500 font-bold flex items-center gap-1.5 mt-1">
+                                <i class="fa-solid fa-building text-amber-600"></i> ${prod.company}
+                            </p>
+                        </div>
+
+                        ${['Seed','Machinery'].includes(prod.cat) ? '' : `<div class="bg-gray-50 p-3 rounded-2xl border border-gray-100 space-y-1">
+                            <span class="text-[10px] font-black text-gray-400 uppercase block">Active Technical</span>
+                            <p class="text-xs font-bold text-gray-800 line-clamp-1">${prod.tech}</p>
+                        </div>`}
+
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-black text-red-600 uppercase block flex items-center gap-1">
+                                <i class="fa-solid fa-bullseye"></i> Target Problem
+                            </span>
+                            <p class="text-xs font-semibold text-gray-600 line-clamp-1">${prod.targets}</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                        <div>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase block">FPO Store Price</span>
+                            <span class="text-xl font-black text-amber-600">${prod.price > 0 ? `₹${prod.price}` : 'Price Not Listed'}</span>
+                            <span class="text-[10px] text-gray-500 font-bold">(${prod.pack})</span>
+                        </div>
+                        <button onclick="openProductModal('${prod.id}')" class="px-4 py-2.5 bg-fpoGreen hover:bg-teal-900 text-white font-extrabold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5">
+                            <span>View Specs</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterCatalog() {
+            const query = document.getElementById('catalog-search').value.toLowerCase();
+            let filtered = productsData;
+
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(p => p.cat === currentCategory);
+            }
+
+            if (query.trim() !== '') {
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(query) ||
+                    p.company.toLowerCase().includes(query) ||
+                    p.tech.toLowerCase().includes(query) ||
+                    p.sku.toLowerCase().includes(query) ||
+                    p.targets.toLowerCase().includes(query) ||
+                    p.cat.toLowerCase().includes(query)
+                );
+            }
+
+            renderCatalogCards(filtered);
+        }
+
+        function filterCategory(cat, btnElement) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-pill').forEach(b => {
+                b.className = "cat-pill px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm bg-white hover:bg-emerald-50 text-gray-700 border border-gray-300 shadow-sm transition flex items-center gap-2";
+            });
+            if (btnElement) {
+                btnElement.className = "cat-pill px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm bg-fpoGreen text-white shadow-sm transition flex items-center gap-2";
+            }
+
+            const indicator = document.getElementById('active-category-indicator');
+            if (cat === 'all') {
+                indicator.innerText = 'Showing All Categories';
+            } else {
+                indicator.innerText = `Filtered Category: ${cat}`;
+            }
+
+            filterCatalog();
+        }
+
+        function updateCategoryCounts() {
+            document.getElementById('count-seed').innerText = productsData.filter(p => p.cat === 'Seed').length;
+            document.getElementById('count-protection').innerText = productsData.filter(p => p.cat === 'Protection').length;
+            document.getElementById('count-nutrition').innerText = productsData.filter(p => p.cat === 'Nutrition').length;
+            document.getElementById('count-machinery').innerText = productsData.filter(p => p.cat === 'Machinery').length;
+            document.getElementById('catalog-count-badge').innerText = `${productsData.length} Verified Products`;
+            document.querySelector('.cat-pill').innerHTML = `<i class="fa-solid fa-border-all"></i> All (${productsData.length})`;
+        }
+
+        function renderLegacyScrollableCropAdvisory() {
+            const cropKey = document.getElementById('crop-select').value;
+            const cropData = cropsDatabase[cropKey] || cropsDatabase['apple'];
+            const container = document.getElementById('stacked-stages-container');
+            container.innerHTML = '';
+
+            cropData.stages.forEach(stg => {
+                const stageCard = document.createElement('div');
+                stageCard.className = "bg-white rounded-3xl shadow-md border border-gray-200 overflow-hidden space-y-0";
+                
+                // 1. Seed Section (Strictly in Stage 1 Sowing / Nursery Phase)
+                let seedSectionHTML = '';
+                if (stg.seedItems && stg.seedItems.length > 0) {
+                    let seedBadges = '';
+                    stg.seedItems.forEach(s => {
+                        const prod = productsData.find(p => p.id === s.solution || p.aliases.includes(s.solution)) || productsData[0];
+                        seedBadges += `
+                            <button onclick="openProductModal('${prod.id}')" class="bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-950 font-extrabold py-2 px-3.5 rounded-xl text-xs transition flex items-center gap-2 shadow-sm">
+                                <i class="fa-solid fa-seedling text-amber-700"></i>
+                                <span>${s.label} (${prod.pack})</span>
+                                <span class="bg-amber-600 text-white px-2.5 py-0.5 rounded-md text-[10px] font-black">₹${prod.price}</span>
+                            </button>
+                        `;
+                    });
+
+                    seedSectionHTML = `
+                        <div class="bg-amber-50/90 border border-amber-200 rounded-2xl p-4 space-y-2">
+                            <div class="flex items-center gap-2 text-xs font-black text-amber-900 uppercase tracking-wider">
+                                <i class="fa-solid fa-wheat-awn text-amber-600"></i>
+                                <span>Recommended Certified Seed Variety / Rootstock Selection (Sowing Phase Only)</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2.5 pt-1">
+                                ${seedBadges}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // 2. Chemical, Biological & Nutritional Problem -> Solution Flow (Stages 2-5)
+                let flowRowsHTML = '';
+                if (stg.flow && stg.flow.length > 0) {
+                    stg.flow.forEach(item => {
+                        const rawSol = item.solution.split(' ')[0];
+                        const labelText = item.solution.includes('text:') ? item.solution.split('text:')[1] : null;
+                        const prod = productsData.find(p => p.id === rawSol || p.aliases.includes(rawSol)) || productsData[0];
+                        const btnText = labelText || `${prod.name} (${prod.pack})`;
+                        
+                        flowRowsHTML += `
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-emerald-300 transition">
+                                <div class="flex items-center gap-2.5 text-xs sm:text-sm font-extrabold text-red-900">
+                                    <i class="fa-solid fa-bug-slash text-red-500"></i>
+                                    <span>${item.problem}</span>
+                                </div>
+                                <div class="hidden sm:flex items-center text-emerald-600 font-black text-base px-2">
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </div>
+                                <div>
+                                    <button onclick="openProductModal('${prod.id}')" class="bg-fpoGreen hover:bg-teal-900 text-white font-extrabold py-2 px-3.5 rounded-xl text-xs transition flex items-center gap-2 shadow-sm group w-full sm:w-auto justify-between sm:justify-start">
+                                        <span><i class="fa-solid fa-flask-vial text-emerald-300 mr-1"></i> ${btnText}</span>
+                                        <span class="bg-amber-400 text-gray-900 px-2 py-0.5 rounded-md text-[10px] font-black">₹${prod.price}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else if (!seedSectionHTML) {
+                    flowRowsHTML = `
+                        <p class="text-xs text-gray-500 italic p-3">Perform standard field sanitation and routine crop monitoring during this phase.</p>
+                    `;
+                }
+
+                stageCard.innerHTML = `
+                    <div class="bg-fpoCardHeader text-white px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div>
+                            <span class="text-xs font-bold text-teal-200 uppercase tracking-widest">${cropData.name}</span>
+                            <h3 class="text-lg sm:text-xl font-black uppercase tracking-wide mt-0.5">${stg.label}</h3>
+                        </div>
+                        <div class="bg-amber-400 text-gray-900 px-3.5 py-1 rounded-full text-xs font-black uppercase shadow-sm">
+                            ${stg.month}
+                        </div>
+                    </div>
+
+                    <div class="p-6 space-y-6">
+                        
+                        <!-- Seed Variety Banner (Stage 1 Only) -->
+                        ${seedSectionHTML}
+
+                        <!-- Growth Milestone & Climate Guidelines -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-1 md:col-span-2">
+                                <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                                    <i class="fa-solid fa-seedling text-emerald-600"></i> Physiological Growth Milestone
+                                </h4>
+                                <p class="text-xs sm:text-sm font-semibold text-gray-800 leading-relaxed">
+                                    ${stg.growth}
+                                </p>
+                            </div>
+                            
+                            <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 space-y-1">
+                                <h4 class="text-xs font-black text-amber-800 uppercase tracking-wider flex items-center gap-2">
+                                    <i class="fa-solid fa-temperature-half"></i> Climate & Protocol Rules
+                                </h4>
+                                <p class="text-xs text-gray-700 font-bold">Ideal Temp: <span class="text-gray-900">${stg.temp}</span></p>
+                                <p class="text-xs text-gray-600 leading-tight font-medium">${stg.management}</p>
+                            </div>
+                        </div>
+
+                        <!-- Directional Problem Statement -> Solution Flow (Stages 2-5) -->
+                        ${flowRowsHTML ? `
+                            <div class="bg-slate-100/70 border border-slate-200 rounded-2xl p-4 space-y-3">
+                                <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+                                    <h4 class="text-xs font-black text-gray-700 uppercase tracking-wider flex items-center gap-2">
+                                        <i class="fa-solid fa-route text-fpoGreen"></i> Field Disease / Pest Problem ➔ FPO Chemical Solution
+                                    </h4>
+                                    <span class="text-[10px] font-bold text-gray-500">Tap Solution Badge for Dosage Specs</span>
+                                </div>
+
+                                <div class="space-y-2.5">
+                                    ${flowRowsHTML}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <div class="border-t border-gray-200 pt-3 text-xs text-gray-600 leading-relaxed bg-gray-50 p-3.5 rounded-2xl border border-gray-200 flex justify-between items-center flex-wrap gap-2">
+                            <span><strong>HP Field Protocol:</strong> Dilute spray mix in 200L water drums ($1\text{ Acre} = 5\text{ Bighas}$). Add <strong>Magstick Silicon Surfactant</strong> during rain season.</span>
+                            <span class="text-emerald-800 font-black cursor-pointer uppercase text-[11px]" onclick="switchTab('catalog')">View Store Catalog ➔</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(stageCard);
+            });
+        }
+
+        function escapeAdvisoryHtml(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
+        function populateCropSelector() {
+            const select = document.getElementById('crop-select');
+            select.innerHTML = '';
+            cropGuideData.crops.forEach(crop => {
+                const option = document.createElement('option');
+                option.value = String(crop.crop_id);
+                option.textContent = `${crop.crop_no} — ${crop.crop_name} (${crop.scientific_name})`;
+                select.appendChild(option);
+            });
+            select.value = String(cropGuideData.crops[0].crop_id);
+        }
+
+        function getCatalogProduct(databaseProductId) {
+            const databaseProduct = cropGuideData.products.find(product => product.product_id === databaseProductId);
+            if (!databaseProduct || databaseProduct.live_price_list_sr_no == null) return null;
+            return productsData.find(product => product.sourceRow === Number(databaseProduct.live_price_list_sr_no)) || null;
+        }
+
+        function renderDatabaseProductButton(databaseProductId) {
+            const databaseProduct = cropGuideData.products.find(product => product.product_id === databaseProductId);
+            const catalogProduct = getCatalogProduct(databaseProductId);
+            if (!databaseProduct || !catalogProduct) {
+                const productName = databaseProduct ? databaseProduct.product_name : 'Product';
+                return `<span class="text-xs font-semibold text-gray-500">${escapeAdvisoryHtml(productName)} — catalog details unavailable</span>`;
+            }
+
+            const price = databaseProduct.price_inr == null ? 'Price not listed' : `₹${escapeAdvisoryHtml(databaseProduct.price_inr)}`;
+            return `
+                <button type="button" onclick="openProductModal('${escapeAdvisoryHtml(catalogProduct.id)}')" class="bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-950 font-extrabold py-2 px-3 rounded-xl text-xs transition inline-flex items-center gap-2">
+                    <span>${escapeAdvisoryHtml(databaseProduct.product_name)} (${escapeAdvisoryHtml(databaseProduct.pack || 'Pack not listed')})</span>
+                    <span class="bg-emerald-700 text-white px-2 py-0.5 rounded-md text-[10px] font-black">${price}</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                </button>
+            `;
+        }
+
+        function renderDatabaseCropAdvisory() {
+            const cropId = Number(document.getElementById('crop-select').value);
+            const crop = cropGuideData.crops.find(item => item.crop_id === cropId);
+            const container = document.getElementById('stacked-stages-container');
+            container.innerHTML = '';
+            if (!crop) {
+                container.innerHTML = '<p class="rounded-2xl bg-amber-50 p-4 text-sm font-semibold text-amber-900">Crop advisory data is unavailable.</p>';
+                return;
+            }
+
+            const cropProfiles = cropGuideData.profiles.filter(profile => profile.crop_id === cropId);
+            const cropSeeds = cropGuideData.seeds.filter(seed => seed.crop_id === cropId);
+            const profileCard = document.createElement('div');
+            profileCard.className = 'bg-white rounded-3xl shadow-md border border-gray-200 p-6 space-y-5';
+            const profileRows = cropProfiles.map(profile => `
+                <div class="space-y-1">
+                    <h4 class="text-xs font-black text-emerald-900 uppercase tracking-wide">${escapeAdvisoryHtml(profile.attribute)}</h4>
+                    <p class="text-sm text-gray-700 leading-relaxed">${escapeAdvisoryHtml(profile.detail)}</p>
+                </div>
+            `).join('');
+            const seedProducts = cropSeeds.map(seed => renderDatabaseProductButton(seed.product_id)).join('');
+            profileCard.innerHTML = `
+                <div class="border-b border-gray-200 pb-4">
+                    <span class="text-xs font-black uppercase tracking-wider text-amber-700">Crop guide database · ${escapeAdvisoryHtml(crop.crop_no)}</span>
+                    <h3 class="text-2xl font-black text-gray-900">${escapeAdvisoryHtml(crop.crop_name)}</h3>
+                    <p class="text-sm italic text-gray-500">${escapeAdvisoryHtml(crop.scientific_name)}</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${profileRows}</div>
+                ${seedProducts ? `<div class="space-y-2 border-t border-gray-200 pt-4"><h4 class="text-xs font-black text-amber-900 uppercase tracking-wide">Linked planting products · tap for catalog details</h4><div class="flex flex-wrap gap-2">${seedProducts}</div></div>` : ''}
+            `;
+            container.appendChild(profileCard);
+
+            cropGuideData.stages.filter(stage => stage.crop_id === cropId).forEach(stage => {
+                const cycle = cropGuideData.cycles.find(item => item.crop_id === cropId && item.stage_no === stage.stage_no);
+                const problems = cropGuideData.problems.filter(problem => problem.stage_id === stage.stage_id);
+                const stageCard = document.createElement('article');
+                stageCard.className = 'bg-white rounded-3xl shadow-md border border-gray-200 overflow-hidden';
+                const problemRows = problems.map(problem => {
+                    const links = cropGuideData.problemProducts
+                        .filter(link => link.problem_id === problem.problem_id)
+                        .map(link => renderDatabaseProductButton(link.product_id))
+                        .join('');
+                    return `
+                        <div class="rounded-2xl border border-gray-200 bg-white p-4 space-y-3">
+                            <div>
+                                <h5 class="font-extrabold text-gray-900">${escapeAdvisoryHtml(problem.problem)}</h5>
+                                <p class="mt-1 text-xs text-gray-600"><strong>Inspect for:</strong> ${escapeAdvisoryHtml(problem.symptoms)}</p>
+                            </div>
+                            <p class="text-sm text-gray-700 leading-relaxed">${escapeAdvisoryHtml(problem.solution)}</p>
+                            ${links ? `<div class="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3"><span class="text-[10px] font-black uppercase text-emerald-800">Linked products</span>${links}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+                stageCard.innerHTML = `
+                    <div class="bg-fpoCardHeader text-white px-6 py-4">
+                        <div class="flex flex-col sm:flex-row justify-between gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-teal-200 uppercase tracking-widest">${escapeAdvisoryHtml(crop.crop_name)} · Stage ${stage.stage_no}</span>
+                                <h3 class="text-lg sm:text-xl font-black uppercase tracking-wide mt-0.5">${escapeAdvisoryHtml(stage.stage_name)}</h3>
+                            </div>
+                            ${cycle ? `<span class="self-start bg-amber-400 text-gray-900 px-3 py-1 rounded-full text-xs font-black">${escapeAdvisoryHtml(cycle.key_focus)}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="p-6 space-y-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="rounded-2xl bg-emerald-50 border border-emerald-200 p-4">
+                                <h4 class="text-xs font-black uppercase text-emerald-900">Field task</h4>
+                                <p class="mt-1 text-sm text-gray-800">${escapeAdvisoryHtml(stage.field_task)}</p>
+                            </div>
+                            <div class="rounded-2xl bg-amber-50 border border-amber-200 p-4">
+                                <h4 class="text-xs font-black uppercase text-amber-900">What to inspect</h4>
+                                <p class="mt-1 text-sm text-gray-800">${escapeAdvisoryHtml(stage.inspect)}</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-black uppercase tracking-wide text-gray-700">Problems, symptoms & database guidance</h4>
+                            ${problemRows}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(stageCard);
+            });
+
+            const cropFlows = cropGuideData.flows.filter(flow => flow.crop_id === cropId);
+            if (cropFlows.length) {
+                const flowGroups = [...new Set(cropFlows.map(flow => flow.flow_title))];
+                const flowCard = document.createElement('section');
+                flowCard.className = 'bg-white rounded-3xl shadow-md border border-gray-200 p-6 space-y-5';
+                flowCard.innerHTML = `
+                    <h3 class="text-xl font-black text-gray-900">Field decision flows</h3>
+                    ${flowGroups.map(title => `
+                        <div class="space-y-2">
+                            <h4 class="text-sm font-black uppercase text-emerald-900">${escapeAdvisoryHtml(title)}</h4>
+                            <ol class="list-decimal pl-5 space-y-1 text-sm text-gray-700">
+                                ${cropFlows.filter(flow => flow.flow_title === title).map(flow => `<li>${escapeAdvisoryHtml(flow.step)}</li>`).join('')}
+                            </ol>
+                        </div>
+                    `).join('')}
+                `;
+                container.appendChild(flowCard);
+            }
+        }
+
+        // -------------------------------------------------------------
+        // TAB 3: HIMACHAL DOSAGE & BARREL CALCULATOR LOGIC
+        // -------------------------------------------------------------
+        function calculateDosage() {
+            const bighas = parseFloat(document.getElementById('calc-bigha').value) || 0;
+            const rate = parseFloat(document.getElementById('calc-rate').value) || 0;
+            const unit = document.getElementById('calc-unit').value;
+            const basis = document.getElementById('calc-basis').value;
+
+            // HP Standard: 1 Bigha requires approx 200 Liters of water spray volume per application (5 Bighas/Acre = ~1000L water)
+            const totalWaterLiters = bighas * 200;
+            const barrels200L = totalWaterLiters / 200;
+            const pumps15L = Math.round(totalWaterLiters / 15);
+
+            let totalChemNeeded = 0;
+            if (basis === 'barrel') {
+                totalChemNeeded = barrels200L * rate;
+            } else { // per bigha
+                totalChemNeeded = bighas * rate;
+            }
+
+            const perPumpChem = (totalChemNeeded / (totalWaterLiters / 15)).toFixed(1);
+
+            document.getElementById('out-water').innerText = `${totalWaterLiters.toLocaleString()} Liters`;
+            document.getElementById('out-containers').innerText = `(${barrels200L} Barrels of 200L / ~${pumps15L} Knapsack Pumps)`;
+
+            if (unit === 'g') {
+                if (totalChemNeeded >= 1000) {
+                    document.getElementById('out-chem').innerText = `${totalChemNeeded.toLocaleString()} Grams (${(totalChemNeeded / 1000).toFixed(2)} kg)`;
+                } else {
+                    document.getElementById('out-chem').innerText = `${totalChemNeeded.toLocaleString()} Grams`;
+                }
+                document.getElementById('out-per-pump').innerText = `(~${perPumpChem}g product per 15L spray pump)`;
+            } else {
+                if (totalChemNeeded >= 1000) {
+                    document.getElementById('out-chem').innerText = `${totalChemNeeded.toLocaleString()} ml (${(totalChemNeeded / 1000).toFixed(2)} Liters)`;
+                } else {
+                    document.getElementById('out-chem').innerText = `${totalChemNeeded.toLocaleString()} ml`;
+                }
+                document.getElementById('out-per-pump').innerText = `(~${perPumpChem}ml product per 15L spray pump)`;
+            }
+        }
+
+        function openProductModal(productId) {
+            const prod = productsData.find(p => p.id === productId || p.aliases.includes(productId));
+            if (!prod) return;
+
+            document.getElementById('modal-cat').innerText = prod.cat;
+            document.getElementById('modal-title').innerText = prod.name;
+            document.getElementById('modal-company').innerText = prod.company;
+            document.getElementById('modal-sku').innerText = `${prod.sku} (${prod.pack})`;
+            document.getElementById('modal-price').innerText = prod.price > 0 ? `₹${prod.price}` : 'Price Not Listed';
+            document.getElementById('modal-tech').innerText = prod.tech;
+            
+            document.getElementById('modal-dosage').innerText = prod.dosage;
+            document.getElementById('modal-targets').innerText = prod.targets;
+            document.getElementById('modal-benefits').innerText = prod.benefits;
+            document.getElementById('modal-precautions').innerText = prod.precautions;
+
+            const isChemical = ["Fungicide","Insectisides","Miticides","Herbicides","FERTILIZER","Nutrition","Tonic","Tonic PGR","Antibiotic","Antivirus","Stickers"].includes(prod.cat)
+                || ["Protection","Nutrition"].includes(prod.cat);
+
+            if (isChemical) {
+                document.getElementById('modal-seed-section').classList.add('hidden');
+                document.getElementById('modal-machinery-section').classList.add('hidden');
+                document.getElementById('modal-tech-label').innerText = 'Chemical / Composition';
+                document.getElementById('modal-dosage-label').innerText = 'Dosage & Application';
+                document.getElementById('modal-targets-label').innerText = 'How It Works & Problem Solved';
+                document.getElementById('modal-benefits-label').innerText = 'Benefits';
+                document.getElementById('modal-precautions-label').innerText = 'Precautions & Special Feature';
+                document.getElementById('modal-dosage').innerText = prod.dosage;
+                document.getElementById('modal-tech-section').classList.remove('hidden');
+                document.getElementById('modal-dosage-section').classList.remove('hidden');
+                document.getElementById('modal-targets-section').classList.remove('hidden');
+                document.getElementById('modal-benefits-section').classList.remove('hidden');
+                document.getElementById('modal-precautions-section').classList.remove('hidden');
+            } else if (prod.cat === 'Seed') {
+                document.getElementById('modal-seed-section').classList.remove('hidden');
+                document.getElementById('modal-machinery-section').classList.add('hidden');
+                document.getElementById('modal-tech-section').classList.add('hidden');
+                document.getElementById('modal-dosage-section').classList.add('hidden');
+                document.getElementById('modal-targets-section').classList.add('hidden');
+                document.getElementById('modal-benefits-section').classList.add('hidden');
+                document.getElementById('modal-precautions-section').classList.add('hidden');
+
+                const resistance = prod.seedResistance || 'Resistance details verified from the supplied seed guide.';
+                const breeding = prod.seedBreeding || 'Breeding details verified from the supplied seed guide.';
+                const seedType = prod.seedType || 'Seed type listed in the supplied guide.';
+
+                document.getElementById('modal-seed-rate').innerText = prod.dosage;
+                document.getElementById('modal-seed-characteristics').innerText = prod.benefits;
+                document.getElementById('modal-seed-resistance').innerText = resistance;
+                document.getElementById('modal-seed-breeding').innerText = breeding;
+                document.getElementById('modal-seed-type').innerText = seedType;
+            } else if (prod.cat === 'Machinery') {
+                document.getElementById('modal-seed-section').classList.add('hidden');
+                document.getElementById('modal-machinery-section').classList.remove('hidden');
+                document.getElementById('modal-tech-section').classList.add('hidden');
+                document.getElementById('modal-dosage-section').classList.add('hidden');
+                document.getElementById('modal-targets-section').classList.add('hidden');
+                document.getElementById('modal-benefits-section').classList.add('hidden');
+                document.getElementById('modal-precautions-section').classList.add('hidden');
+
+                document.getElementById('modal-mach-power').innerText = prod.machinePower || prod.tech || 'Power or passive-operation details from the live list.';
+                document.getElementById('modal-mach-specs').innerText = prod.machineSpecs || `Pack or specification: ${prod.pack}.`;
+                document.getElementById('modal-mach-use').innerText = prod.machineUse || prod.targets || 'Farm equipment or tool use.';
+                document.getElementById('modal-mach-performance').innerText = prod.machinePerformance || prod.benefits || 'Operation and performance information.';
+                document.getElementById('modal-mach-care').innerText = prod.machineCare || prod.precautions || 'Follow the equipment manual and use standard safety precautions.';
+            } else {
+                document.getElementById('modal-seed-section').classList.add('hidden');
+                document.getElementById('modal-machinery-section').classList.add('hidden');
+                document.getElementById('modal-tech-label').innerText = 'Active Chemical Formulation / Technical';
+                document.getElementById('modal-dosage-label').innerText = 'Recommended Dosage (Per Bigha & Barrel)';
+                document.getElementById('modal-targets-label').innerText = 'Target Pests, Diseases & Deficiencies';
+                document.getElementById('modal-benefits-label').innerText = 'Key Field Benefits';
+                document.getElementById('modal-precautions-label').innerText = 'Safety Precautions & PHI Guidelines';
+                document.getElementById('modal-tech-section').classList.remove('hidden');
+                document.getElementById('modal-dosage-section').classList.remove('hidden');
+                document.getElementById('modal-targets-section').classList.remove('hidden');
+                document.getElementById('modal-benefits-section').classList.remove('hidden');
+                document.getElementById('modal-precautions-section').classList.remove('hidden');
+            }
+
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        // Initialize application on load
+        window.onload = function() {
+            populateCropSelector();
+            updateCategoryCounts();
+            renderCatalogCards(productsData);
+            calculateDosage();
+        };
+    </script>
+</body>
+</html>
